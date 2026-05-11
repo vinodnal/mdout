@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Generated output
+*.docx
+*.pdf
+
+# Projects (user content, not tracked)
+projects/
+
+# Debug / temp artifacts
+*.png
+output_inspect/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.env
+.env.*
+*.log
+
+# VS Code
+.vscode/

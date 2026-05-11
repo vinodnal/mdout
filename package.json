@@ -1,0 +1,43 @@
+{
+  "name": "mdoc",
+  "version": "1.0.0",
+  "description": "Markdown → Word/PDF document builder for developers and AI agents. Write documents in Markdown, import images/scripts/other docs, compile to professional DOCX and PDF.",
+  "main": "src/index.js",
+  "bin": {
+    "mdoc": "./bin/mdoc.js"
+  },
+  "files": [
+    "src/",
+    "bin/",
+    "core/",
+    "build.js",
+    "README.md",
+    "USAGE.md"
+  ],
+  "keywords": [
+    "markdown",
+    "docx",
+    "pdf",
+    "word",
+    "document",
+    "builder",
+    "generator",
+    "ai",
+    "agent",
+    "template",
+    "report",
+    "thesis"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "canvas": "^3.2.3",
+    "chokidar": "^4.0.3",
+    "docx": "^9.6.1"
+  },
+  "optionalDependencies": {
+    "temml": "^0.10.0"
+  }
+}

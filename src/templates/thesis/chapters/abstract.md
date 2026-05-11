@@ -1,0 +1,5 @@
+# Abstract {.no-num}
+
+Provide a concise summary of the thesis (200–400 words).
+
+**Keywords:** keyword1, keyword2, keyword3.

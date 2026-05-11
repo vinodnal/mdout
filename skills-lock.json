@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "research": {
+      "source": "Weizhena/Deep-Research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/research-codex-en/research/SKILL.md",
+      "computedHash": "e17440f94563904e74fe928e295afbaef0ecb45b90e840b9c469b5b430fa22a0"
+    },
+    "research-add-fields": {
+      "source": "Weizhena/Deep-Research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/research-codex-en/research-add-fields/SKILL.md",
+      "computedHash": "0920ec62e00cf02ad14e55a9760d92ccd1d0e2471c4dfbfe67761fbcd5115901"
+    },
+    "research-add-items": {
+      "source": "Weizhena/Deep-Research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/research-codex-en/research-add-items/SKILL.md",
+      "computedHash": "b5a7c293dc4bbfbbc49404c4fe9ab81cf3d91dd922244381fdab68621f479d9b"
+    },
+    "research-deep": {
+      "source": "Weizhena/Deep-Research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/research-codex-en/research-deep/SKILL.md",
+      "computedHash": "ef63152f1bca01f42caf5317da13deb49ac0491a391fa1aa30f277274ba17dab"
+    },
+    "research-report": {
+      "source": "Weizhena/Deep-Research-skills",
+      "sourceType": "github",
+      "skillPath": "skills/research-codex-en/research-report/SKILL.md",
+      "computedHash": "ca1e62cf3c250c39bbfda421f7d9e2b18eeac69fc43afe2dc6b73bfe6cb3da5f"
+    }
+  }
+}
