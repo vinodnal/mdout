@@ -21,13 +21,16 @@
 
 const path = require("path");
 
-const { buildFromConfig }  = require("./builder");
+const { buildFromConfig }  = require("./builder/index");
 const { validate }         = require("./validator");
 const { createRenderer }   = require("./renderer");
-const { parseMD }          = require("./parser");
+const { parseMD }          = require("./parser/index");
 const { createImporter }   = require("./importer");
 const { createLogger, makeNullLogger, CODES } = require("./logger");
 const { validateConfig }   = require("./schema");
+const { exportPdfToImages } = require("./exporter/images");
+const { flattenToMarkdown } = require("./exporter/markdown");
+const { parsePageSpec, findExecutable } = require("./exporter/pages");
 
 /**
  * Build a project from a config file path.
@@ -78,6 +81,10 @@ module.exports = {
   createRenderer,
   parseMD,
   createImporter,
+  exportPdfToImages,
+  flattenToMarkdown,
+  parsePageSpec,
+  findExecutable,
   // Config
   validateConfig,
   // Logging

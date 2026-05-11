@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * bin/mdoc.js — mdoc CLI entry point
- * Delegates to src/cli.js
+ * Delegates to src/cli/index.js
  */
 "use strict";
-require("../src/cli").run(process.argv);
+require("../src/cli/index").run(process.argv);

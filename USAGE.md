@@ -33,7 +33,8 @@ npm install mdoc
 ### Running locally (from the workspace root)
 
 ```bash
-node build.js <project-dir>
+# from this repository checkout:
+node bin/mdoc.js <project-dir>
 # or, if installed globally / via npx:
 mdoc <project-dir>
 ```
@@ -61,7 +62,7 @@ mdoc validate [options] <project-dir>    Validate imports and variables without 
 mdoc init [options] <new-dir>            Scaffold a new project from a template
 ```
 
-When no command is given and the first argument is a path, `build` is assumed (backward-compatible with the original `node build.js` interface).
+When no command is given and the first argument is a path, `build` is assumed.
 
 ---
 
@@ -1191,12 +1192,15 @@ const {
 
 ### Exporter API
 
-The exporter sub-modules are available for direct programmatic use:
+The exporter helpers are available from the public package API:
 
 ```js
-const { exportPdfToImages } = require('mdoc/src/exporter/images');
-const { flattenToMarkdown } = require('mdoc/src/exporter/markdown');
-const { parsePageSpec, findExecutable } = require('mdoc/src/exporter/pages');
+const {
+  exportPdfToImages,
+  flattenToMarkdown,
+  parsePageSpec,
+  findExecutable,
+} = require('mdoc');
 ```
 
 #### `exportPdfToImages(pdfPath, opts)` → `Promise<{ page, path }[]>`

@@ -18,12 +18,34 @@
 
 const fs   = require("fs");
 const path = require("path");
+const { execFileSync } = require("child_process");
 
 const { validateConfig } = require("./schema");
 const { CODES }          = require("./logger");
 
 const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"]);
+const SCRIPT_EXTS = new Set([".js", ".ts", ".py"]);
 const VAR_RE     = /\{\{(\w[\w.]*)\}\}/g;
+
+const commandExistsCache = new Map();
+
+function commandExists(command) {
+  if (commandExistsCache.has(command)) return commandExistsCache.get(command);
+  const checker = process.platform === "win32" ? "where" : "which";
+  let exists = false;
+  try {
+    const out = execFileSync(checker, [command], {
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "ignore"],
+      timeout: 4000,
+    }).trim();
+    exists = Boolean(out);
+  } catch {
+    exists = false;
+  }
+  commandExistsCache.set(command, exists);
+  return exists;
+}
 
 // ─── Crawl all imports from an MD file ───────────────────────────────────────
 
@@ -77,6 +99,23 @@ function crawl(filePath, availableVars, results, visitStack, visited) {
           });
         } else if (ext === ".md" || ext === ".txt") {
           crawl(absImport, Object.fromEntries([...localVars].map(k => [k, ""])), results, visitStack, visited);
+        } else if (SCRIPT_EXTS.has(ext)) {
+          const runtime = ext === ".py" ? "python" : ext === ".ts" ? "ts-node" : "node";
+          if (!commandExists(runtime)) {
+            results.warnings.push({
+              code: "W001",
+              message: `Runtime '${runtime}' not found for script import: ${relPath}`,
+              file: normalized,
+              line: i + 1,
+            });
+          }
+        } else if (!IMAGE_EXTS.has(ext) && ext !== ".docx" && ext !== "") {
+          results.warnings.push({
+            code: "W001",
+            message: `Unsupported import type '${ext}': ${relPath}`,
+            file: normalized,
+            line: i + 1,
+          });
         }
         results.imports.push({ from: normalized, to: absImport, exists });
       }

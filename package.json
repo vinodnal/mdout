@@ -13,7 +13,6 @@
   "files": [
     "src/",
     "bin/",
-    "build.js",
     "README.md",
     "USAGE.md"
   ],

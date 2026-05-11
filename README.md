@@ -137,10 +137,6 @@ mdoc/
 ├── bin/
 │   └── mdoc.js            — CLI executable entry point
 │
-├── core/                  — ⚠ Backward-compat shims (deprecated, delegate to src/)
-│
-├── build.js               — Legacy CLI wrapper (delegates to bin/mdoc.js)
-│
 ├── projects/              — Your document projects (git-ignored)
 │   └── my-project/
 │       ├── project.config.js
@@ -385,8 +381,6 @@ mdoc export md --out ./flat.md projects/my-thesis
 ```
 
 > **Note:** PDF generation requires [LibreOffice](https://www.libreoffice.org/) (`soffice` on PATH). On Windows, if Microsoft Word is installed, it is tried first.
-
-> **Backward compat:** `node build.js <project-dir>` still works (delegates to `mdoc`).
 
 ---
 
