@@ -150,26 +150,6 @@ function createStylesRenderer({ C, FONT, CODE_FONT, FS, H1_FS, H2_FS, H3_FS, H4_
             border:  { left: { style: BorderStyle.SINGLE, size: 12, color: C.ACCENT, space: 12 } },
           },
         },
-        // ── Arabic (RTL) ───────────────────────────────────────────────────
-        {
-          id: "ArabicParagraph", name: "Arabic Paragraph", basedOn: "Normal",
-          run: { font: FONT, size: FS, color: C.BODY, rightToLeft: true, language: { bidirectional: 'ar-SA', value: 'ar-SA' } },
-          paragraph: {
-            bidirectional: true,
-            alignment: AlignmentType.RIGHT,
-            spacing: { line: SP.paragraphLine, after: SP.paragraphAfter },
-          },
-        },
-        {
-          id: "ArabicHeadingNoToc", name: "Arabic Heading No TOC", basedOn: "Normal",
-          run: { font: FONT, size: H1_FS, bold: true, color: C.H1, allCaps: false, rightToLeft: true, language: { bidirectional: 'ar-SA', value: 'ar-SA' } },
-          paragraph: {
-            bidirectional: true,
-            alignment: AlignmentType.RIGHT,
-            spacing: { before: hs.h1.before, after: hs.h1.after },
-            border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: C.H1, space: 6 } },
-          },
-        },
       ],
     };
   }

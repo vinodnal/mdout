@@ -118,7 +118,7 @@ function createElementsRenderer({
       children:  parseInlineRuns(captionText),
     };
     if (isArabic) {
-      para.bidirectional = true;
+      para.bidi = true;
     }
     return new Paragraph(para);
   }
@@ -128,21 +128,16 @@ function createElementsRenderer({
   function makeParagraph(text, opts = {}) {
     const appliedText = applyVars(text);
     const isArabic = hasArabic(appliedText);
-    if (isArabic) {
-      return new Paragraph({
-        style:         "ArabicParagraph",
-        bidirectional: true,
-        alignment:     AlignmentType.RIGHT,
-        children:      parseInlineRuns(appliedText),
-        indent:        opts.indent,
-      });
-    }
-    return new Paragraph({
+    const para = {
       children:  parseInlineRuns(appliedText),
       spacing:   { line: SP.paragraphLine, after: SP.paragraphAfter },
-      alignment: opts.alignment,
+      alignment: isArabic ? AlignmentType.RIGHT : opts.alignment,
       indent:    opts.indent,
-    });
+    };
+    if (isArabic) {
+      para.bidi = true;
+    }
+    return new Paragraph(para);
   }
 
   function makeHeading(text, level, opts = {}) {
@@ -156,19 +151,12 @@ function createElementsRenderer({
       .trim();
     const clampedLevel = Math.max(1, Math.min(4, level || 1));
     const isArabic = hasArabic(clean);
-    if (isArabic && opts.nonumber) {
-      return new Paragraph({
-        style:   "ArabicHeadingNoToc",
-        children: [new TextRun({ text: clean, rightToLeft: true })],
-        pageBreakBefore: opts.pageBreakBefore || false,
-      });
-    }
     const para = {
       alignment: opts.alignment ?? (isArabic ? AlignmentType.RIGHT : (opts.nonumber ? AlignmentType.CENTER : undefined)),
       children:  [new TextRun(clean)],
     };
     if (isArabic) {
-      para.bidirectional = true;
+      para.bidi = true;
     }
     if (!opts.nonumber) {
       para.heading   = lvlMap[clampedLevel] || HeadingLevel.HEADING_1;
@@ -190,7 +178,7 @@ function createElementsRenderer({
       children:  parseInlineRuns(captionText),
     };
     if (isArabic) {
-      para.bidirectional = true;
+      para.bidi = true;
     }
     return new Paragraph(para);
   }
@@ -204,7 +192,7 @@ function createElementsRenderer({
       children:  parseInlineRuns(clean),
     };
     if (isArabic) {
-      para.bidirectional = true;
+      para.bidi = true;
     }
     return new Paragraph(para);
   }

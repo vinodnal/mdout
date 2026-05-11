@@ -143,10 +143,7 @@ function createInlineRenderer({ C, FONT, CODE_FONT, MATH_FONT, FS, CODE_FS, fsMa
   function makeRun(text, overrides = {}) {
     const isArabic = hasArabic(text);
     const baseRun = { text, font: FONT, size: FS, color: C.BODY, ...overrides };
-    if (isArabic) {
-      baseRun.rightToLeft = true;
-      if (!baseRun.language) baseRun.language = { bidirectional: 'ar-SA', value: 'ar-SA' };
-    }
+    if (isArabic) baseRun.rtl = true;
     return new TextRun(baseRun);
   }
 
@@ -210,7 +207,7 @@ function createInlineRenderer({ C, FONT, CODE_FONT, MATH_FONT, FS, CODE_FS, fsMa
     pushStyledRuns(source.slice(segmentStart), runs);
     return runs.length
       ? runs
-      : [new TextRun({ text: source, font: FONT, size: FS, color: C.BODY, ...(hasArabic(source) ? { rightToLeft: true, language: { bidirectional: 'ar-SA', value: 'ar-SA' } } : {}) })];
+      : [new TextRun({ text: source, font: FONT, size: FS, color: C.BODY, ...(hasArabic(source) ? { rtl: true } : {}) })];
   }
 
   return { parseInlineRuns, pushStyledRuns, makeRun, resolveColor };

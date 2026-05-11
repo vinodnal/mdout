@@ -180,6 +180,34 @@ function drawArrow(ctx, x1, y1, x2, y2, {
   }
 }
 
+// ─── Dot ─────────────────────────────────────────────────────────────────────
+
+function drawDot(ctx, x, y, r = 5, fill = "#2E75B6", stroke = "#FFFFFF") {
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = fill;
+  ctx.fill();
+  if (stroke) {
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+}
+
+// ─── Rotated label ────────────────────────────────────────────────────────────
+
+function rotatedLabel(ctx, text, x, y, angleDeg, { color = "#333", font = "12px sans-serif" } = {}) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate((angleDeg * Math.PI) / 180);
+  ctx.fillStyle = color;
+  ctx.font = font;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 0, 0);
+  ctx.restore();
+}
+
 // ─── Legend ───────────────────────────────────────────────────────────────────
 
 function drawLegend(ctx, items, x, y, {
@@ -232,6 +260,8 @@ module.exports = {
   roundRect,
   drawBox,
   drawArrow,
+  drawDot,
+  rotatedLabel,
   drawLegend,
   saveAndPrint,
 };
