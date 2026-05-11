@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "Markdown → Word/PDF document builder for developers and AI agents. Write documents in Markdown, import images/scripts/other docs, compile to professional DOCX and PDF.",
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./canvas-utils": "./src/canvas-utils.js",
+    "./core/canvas-utils": "./core/canvas-utils.js"
+  },
   "bin": {
     "mdoc": "./bin/mdoc.js"
   },
