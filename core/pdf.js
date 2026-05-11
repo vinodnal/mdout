@@ -13,7 +13,7 @@ module.exports = require("../src/pdf");
 "use strict";
 
 const { execFileSync } = require("child_process");
-const path             = require("fs").existsSync;
+const path             = require("path");
 const fs               = require("fs");
 
 const SOFFICE_CANDIDATES = [

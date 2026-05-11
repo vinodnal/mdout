@@ -722,8 +722,10 @@ function createRenderer(theme = {}, pageConfig = {}, vars = {}, logger = null) {
         pos += 2 + data.readUInt16BE(pos + 2);
       }
     }
-    const maxPx   = opts.width ? parseInt(opts.width) : Math.round(CONTENT_W / 15);
-    const scale   = maxPx / dims.width;
+    const maxPx   = opts.width ? Math.max(1, parseInt(opts.width) || 1) : Math.round(CONTENT_W / 15);
+    const safeW   = dims.width  || 480;
+    const safeH   = dims.height || 320;
+    const scale   = maxPx / safeW;
     const typeMap = { ".png": "png", ".jpg": "jpg", ".jpeg": "jpg", ".gif": "gif", ".bmp": "bmp", ".webp": "png" };
     const imgType = typeMap[(ext || ".png").toLowerCase()] || "png";
 
@@ -737,7 +739,7 @@ function createRenderer(theme = {}, pageConfig = {}, vars = {}, logger = null) {
       spacing:   { before: 160, after: opts.caption ? 60 : 200 },
       children:  [new ImageRun({
         data,
-        transformation: { width: Math.round(dims.width * scale), height: Math.round(dims.height * scale) },
+        transformation: { width: Math.round(safeW * scale), height: Math.round(safeH * scale) },
         type: imgType,
       })],
     })];

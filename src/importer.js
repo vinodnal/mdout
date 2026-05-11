@@ -17,9 +17,9 @@
  */
 "use strict";
 
-const fs         = require("fs");
-const path       = require("path");
-const { execSync } = require("child_process");
+const fs           = require("fs");
+const path         = require("path");
+const { execFileSync } = require("child_process");
 
 const { retrySync } = require("./utils");
 
@@ -34,7 +34,8 @@ function extractDocxTextSync(absPath) {
     "  .catch(e=>{ console.error(e && e.message ? e.message : String(e)); process.exit(1); });",
   ].join("");
 
-  return execSync(`node -e \"${script.replace(/\"/g, '\\\\"')}\"`, {
+  // Pass script via --eval (no shell interpretation, no escaping needed).
+  return execFileSync("node", ["--eval", script], {
     encoding: "utf-8",
     timeout: 30000,
     maxBuffer: 10 * 1024 * 1024,
@@ -110,12 +111,16 @@ function createImporter(R, parseFn, opts = {}) {
 
     if (ext === ".js" || ext === ".ts" || ext === ".py") {
       try {
-        const cmd = ext === ".py"
-          ? `python "${absPath}"`
+        // Use execFileSync (no shell) to prevent shell-injection via crafted paths.
+        const [interpreter, scriptArgs] = ext === ".py"
+          ? ["python",  [absPath]]
           : ext === ".ts"
-          ? `ts-node "${absPath}"`
-          : `node "${absPath}"`;
-        const stdout = execSync(cmd, { encoding: "utf-8", timeout: 30000 }).trim();
+          ? ["ts-node", [absPath]]
+          : ["node",    [absPath]];
+        const stdout = execFileSync(interpreter, scriptArgs, {
+          encoding: "utf-8",
+          timeout:  30000,
+        }).trim();
 
         if (!stdout) return [];
 

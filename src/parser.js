@@ -46,6 +46,7 @@
 const path = require("path");
 const fs   = require("fs");
 const { Paragraph, PageBreak, AlignmentType } = require("docx");
+const { retrySync } = require("./utils");
 
 const ALIGN_MAP = {
   left:   AlignmentType.LEFT,
@@ -327,7 +328,7 @@ function parseMD(text, dir, R, importFn, opts = {}) {
       const relImg = imgMatch[2];
       const absImg = path.resolve(dir, relImg);
       if (fs.existsSync(absImg)) {
-        const data = fs.readFileSync(absImg);
+        const data = retrySync(() => fs.readFileSync(absImg));
         const captionMeta = pendingElement
           ? { kind: pendingElement.kind, state, title: pendingElement.title }
           : { caption: imgMatch[1], state };
@@ -400,10 +401,8 @@ function parseMD(text, dir, R, importFn, opts = {}) {
         i++;
       }
       i++; // consume closing ```
-      if (pendingStyle) {
-        // Callout wrapping code is unusual — render normally
-        pendingStyle = null;
-      }
+      pendingStyle = null;
+      if (pendingElement && pendingElement.kind !== "annex") clearPending();
       push(R.makeCodeBlock(codeLines));
       continue;
     }
@@ -413,6 +412,7 @@ function parseMD(text, dir, R, importFn, opts = {}) {
     // ════════════════════════════════════════════════════════════════════════
 
     if (trimmed.startsWith("$$") && trimmed.endsWith("$$") && trimmed.length > 4) {
+      if (pendingElement && pendingElement.kind !== "annex") clearPending();
       push(R.makeMathParagraph(trimmed.slice(2, -2).trim()));
       i++; continue;
     }
@@ -424,6 +424,7 @@ function parseMD(text, dir, R, importFn, opts = {}) {
         i++;
       }
       i++;
+      if (pendingElement && pendingElement.kind !== "annex") clearPending();
       push(R.makeMathParagraph(formulaLines.join(" ")));
       continue;
     }
@@ -468,7 +469,7 @@ function parseMD(text, dir, R, importFn, opts = {}) {
 
     if (/^[-*]\s+/.test(trimmed)) {
       const leadingSpaces = raw.match(/^(\s*)/)[1].length;
-      const level = leadingSpaces >= 4 ? 1 : (leadingSpaces >= 2 ? 0 : 0);
+      const level = leadingSpaces >= 4 ? 1 : 0;
       push(R.makeBullet(trimmed, level));
       i++; continue;
     }
