@@ -36,10 +36,8 @@
  *   {color:X}t{/color} Colored text (X = theme key or hex)
  *   <br> / <br />      Line break
  *
- * ── Deprecated (still work with W002 warning) ─────────────────────────────────
- *   <div align="...">...</div>    Use {.center} / {.right} instead
- *   {.box}                        Use <!-- @style: box --> before the paragraph instead
- *   --- / *** / ___               Use <!-- @page-break --> instead
+ * ── Notes ───────────────────────────────────────────────────────────────────
+ *   Thematic breaks (--- / *** / ___) are treated as separators (ignored by the DOCX renderer).
  */
 "use strict";
 
@@ -220,33 +218,10 @@ function parseMD(text, dir, R, importFn, opts = {}) {
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    // DEPRECATED: <div align="…"> … </div>
-    // ════════════════════════════════════════════════════════════════════════
-
-    const openDivAlign = trimmed.match(/^<div\s+align=["'](left|center|right)["']\s*>$/i);
-    if (openDivAlign) {
-      if (logger) logger.warn(
-        `<div align="${openDivAlign[1]}"> is deprecated. Use {.${openDivAlign[1]}} modifier instead.`,
-        "W002"
-      );
-      alignStack.push(ALIGN_MAP[openDivAlign[1].toLowerCase()]);
-      i++; continue;
-    }
-    if (/^<\/div>$/i.test(trimmed)) {
-      if (alignStack.length) alignStack.pop();
-      i++; continue;
-    }
-
-    // ════════════════════════════════════════════════════════════════════════
-    // DEPRECATED: --- / *** / ___ (standalone page break)
+    // THEMATIC BREAKS  --- / *** / ___
     // ════════════════════════════════════════════════════════════════════════
 
     if (trimmed === "---" || trimmed === "***" || trimmed === "___") {
-      if (logger) logger.warn(
-        `"${trimmed}" for page breaks is deprecated. Use <!-- @page-break --> instead.`,
-        "W002"
-      );
-      push(new Paragraph({ children: [new PageBreak()] }));
       i++; continue;
     }
 
@@ -377,15 +352,6 @@ function parseMD(text, dir, R, importFn, opts = {}) {
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    // LEGACY CAPTIONS  *Figure…  *Tableau…
-    // ════════════════════════════════════════════════════════════════════════
-
-    if (/^\*(Figure|Tableau|Graphique|Table|Annexe)/i.test(trimmed)) {
-      push(R.makeCaption(trimmed, currentAlignment() ? { alignment: currentAlignment() } : {}));
-      i++; continue;
-    }
-
-    // ════════════════════════════════════════════════════════════════════════
     // BULLET LIST  - item  or  * item
     // ════════════════════════════════════════════════════════════════════════
 
@@ -425,12 +391,6 @@ function parseMD(text, dir, R, importFn, opts = {}) {
                    : modifiers.has("left")   ? ALIGN_MAP.left
                    : currentAlignment();
     const pageBreak = modifiers.has("page-break");
-
-    // Deprecated {.box} — remap to pending style
-    if (modifiers.has("box")) {
-      if (logger) logger.warn("{.box} is deprecated. Use <!-- @style: box --> before the paragraph instead.", "W002");
-      pendingStyle = "box";
-    }
 
     if (pendingStyle) {
       const style = pendingStyle;
