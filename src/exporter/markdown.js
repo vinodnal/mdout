@@ -59,109 +59,113 @@ function flattenFile(filePath, vars, visited, outDir, logger) {
   }
   visited.add(absPath);
 
-  if (!fs.existsSync(absPath)) {
-    if (logger) logger.warn(`File not found: ${absPath}`, "W001");
-    return `<!-- file not found: ${path.basename(absPath)} -->\n`;
-  }
+  try {
+    if (!fs.existsSync(absPath)) {
+      if (logger) logger.warn(`File not found: ${absPath}`, "W001");
+      return `<!-- file not found: ${path.basename(absPath)} -->\n`;
+    }
 
-  const dir   = path.dirname(absPath);
-  const text  = fs.readFileSync(absPath, "utf-8");
-  const lines = text.split(/\r?\n/);
-  const out   = [];
+    const dir   = path.dirname(absPath);
+    const text  = fs.readFileSync(absPath, "utf-8");
+    const lines = text.split(/\r?\n/);
+    const out   = [];
 
-  // First pass: collect @var definitions
-  const localVars = Object.assign({}, vars);
-  for (const line of lines) {
-    const m = line.trim().match(/^<!--\s*@var:\s*(\w[\w.]*)\s*=\s*(.+?)\s*-->$/i);
-    if (m) localVars[m[1]] = m[2];
-  }
+    // First pass: collect @var definitions
+    const localVars = Object.assign({}, vars);
+    for (const line of lines) {
+      const m = line.trim().match(/^<!--\s*@var:\s*(\w[\w.]*)\s*=\s*(.+?)\s*-->$/i);
+      if (m) localVars[m[1]] = m[2];
+    }
 
-  for (let i = 0; i < lines.length; i++) {
-    const line    = lines[i];
-    const trimmed = line.trim();
+    for (let i = 0; i < lines.length; i++) {
+      const line    = lines[i];
+      const trimmed = line.trim();
 
-    // @import directive
-    const importMatch = trimmed.match(/^<!--\s*@import:\s*(.*?)\s*-->$/i);
-    if (importMatch) {
-      const { relPath, opts } = parseImportDirective(importMatch[1]);
-      if (!relPath) { out.push(line); continue; }
+      // @import directive
+      const importMatch = trimmed.match(/^<!--\s*@import:\s*(.*?)\s*-->$/i);
+      if (importMatch) {
+        const { relPath, opts } = parseImportDirective(importMatch[1]);
+        if (!relPath) { out.push(line); continue; }
 
-      const absImport = path.resolve(dir, relPath);
-      const ext       = path.extname(absImport).toLowerCase();
+        const absImport = path.resolve(dir, relPath);
+        const ext       = path.extname(absImport).toLowerCase();
 
-      // Image → Markdown image reference with path relative to output file
-      if (IMAGE_EXTS.has(ext)) {
-        const rel    = path.relative(outDir, absImport).replace(/\\/g, "/");
-        const caption = opts.caption || opts.title || path.basename(absImport, ext);
-        out.push(`\n![${caption}](${rel})\n`);
-        continue;
-      }
-
-      // Script → execute and embed stdout
-      if (SCRIPT_EXTS.has(ext)) {
-        try {
-          const [interp, sArgs] = ext === ".py" ? ["python", [absImport]]
-                                : ext === ".ts"  ? ["ts-node", [absImport]]
-                                :                  ["node", [absImport]];
-          const stdout = execFileSync(interp, sArgs, {
-            encoding: "utf-8",
-            timeout: 30000,
-            maxBuffer: 8 * 1024 * 1024,
-            cwd: dir,
-          });
-          // Scripts may output image paths (one line = image path) or markdown
-          const firstLine = stdout.trim().split(/\r?\n/)[0];
-          const scriptExt = path.extname(firstLine).toLowerCase();
-          if (IMAGE_EXTS.has(scriptExt) && fs.existsSync(path.resolve(dir, firstLine.trim()))) {
-            const absImg = path.resolve(dir, firstLine.trim());
-            const rel    = path.relative(outDir, absImg).replace(/\\/g, "/");
-            out.push(`\n![](${rel})\n`);
-          } else {
-            out.push("\n" + stdout.trim() + "\n");
-          }
-        } catch (err) {
-          if (logger) logger.warn(`Script execution failed: ${absImport} — ${err.message}`, "W003");
-          out.push(`<!-- script error: ${path.basename(absImport)} -->\n`);
+        // Image -> Markdown image reference with path relative to output file
+        if (IMAGE_EXTS.has(ext)) {
+          const rel    = path.relative(outDir, absImport).replace(/\\/g, "/");
+          const caption = opts.caption || opts.title || path.basename(absImport, ext);
+          out.push(`\n![${caption}](${rel})\n`);
+          continue;
         }
+
+        // Script -> execute and embed stdout
+        if (SCRIPT_EXTS.has(ext)) {
+          try {
+            const [interp, sArgs] = ext === ".py" ? ["python", [absImport]]
+                                  : ext === ".ts"  ? ["ts-node", [absImport]]
+                                  :                  ["node", [absImport]];
+            const stdout = execFileSync(interp, sArgs, {
+              encoding: "utf-8",
+              timeout: 30000,
+              maxBuffer: 8 * 1024 * 1024,
+              cwd: dir,
+            });
+            // Scripts may output image paths (one line = image path) or markdown
+            const firstLine = stdout.trim().split(/\r?\n/)[0];
+            const scriptExt = path.extname(firstLine).toLowerCase();
+            if (IMAGE_EXTS.has(scriptExt) && fs.existsSync(path.resolve(dir, firstLine.trim()))) {
+              const absImg = path.resolve(dir, firstLine.trim());
+              const rel    = path.relative(outDir, absImg).replace(/\\/g, "/");
+              out.push(`\n![](${rel})\n`);
+            } else {
+              out.push("\n" + stdout.trim() + "\n");
+            }
+          } catch (err) {
+            if (logger) logger.warn(`Script execution failed: ${absImport} — ${err.message}`, "W003");
+            out.push(`<!-- script error: ${path.basename(absImport)} -->\n`);
+          }
+          continue;
+        }
+
+        // .docx -> placeholder
+        if (ext === ".docx") {
+          out.push(`<!-- embedded docx: ${path.relative(dir, absImport)} -->\n`);
+          continue;
+        }
+
+        // .md / .txt -> recurse
+        if (ext === ".md" || ext === ".txt" || ext === "") {
+          const nested = flattenFile(absImport, localVars, visited, outDir, logger);
+          out.push("\n" + nested.trim() + "\n");
+          continue;
+        }
+
+        // Unknown -> comment
+        out.push(`<!-- unsupported import: ${path.basename(absImport)} -->\n`);
         continue;
       }
 
-      // .docx → placeholder
-      if (ext === ".docx") {
-        out.push(`<!-- embedded docx: ${path.relative(dir, absImport)} -->\n`);
+      // @toc / @list / @element / @page-break - keep as-is (informative in flat MD)
+      // @var - already collected above; keep the line as a comment
+      const varMatch = trimmed.match(/^<!--\s*@var:/i);
+      if (varMatch) {
+        out.push(`<!-- (var defined) ${trimmed.slice(4).trim()} -->`);
         continue;
       }
 
-      // .md / .txt → recurse
-      if (ext === ".md" || ext === ".txt" || ext === "") {
-        const nested = flattenFile(absImport, localVars, visited, outDir, logger);
-        out.push("\n" + nested.trim() + "\n");
-        continue;
-      }
+      // Apply {{variable}} substitution
+      const resolved = line.replace(/\{\{([\w.]+)\}\}/g, (_, name) =>
+        Object.prototype.hasOwnProperty.call(localVars, name) ? localVars[name] : `{{${name}}}`
+      );
 
-      // Unknown → comment
-      out.push(`<!-- unsupported import: ${path.basename(absImport)} -->\n`);
-      continue;
+      out.push(resolved);
     }
 
-    // @toc / @list / @element / @page-break — keep as-is (informative in flat MD)
-    // @var — already collected above; keep the line as a comment
-    const varMatch = trimmed.match(/^<!--\s*@var:/i);
-    if (varMatch) {
-      out.push(`<!-- (var defined) ${trimmed.slice(4).trim()} -->`);
-      continue;
-    }
-
-    // Apply {{variable}} substitution
-    const resolved = line.replace(/\{\{([\w.]+)\}\}/g, (_, name) =>
-      Object.prototype.hasOwnProperty.call(localVars, name) ? localVars[name] : `{{${name}}}`
-    );
-
-    out.push(resolved);
+    return out.join("\n");
+  } finally {
+    // allow the same file in separate branches and keep cycle tracking consistent on errors
+    visited.delete(absPath);
   }
-
-  visited.delete(absPath); // allow the same file in separate branches
-  return out.join("\n");
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -193,7 +197,7 @@ async function flattenToMarkdown(configPath, opts = {}) {
   const outDir   = path.dirname(outPath);
   fs.mkdirSync(outDir, { recursive: true });
 
-  const vars     = Object.assign({}, rawConfig.vars || {});
+  const vars     = Object.assign({}, rawConfig.vars || {}, opts.vars || {});
   const visited  = new Set();
   const parts    = [];
 
@@ -206,7 +210,7 @@ async function flattenToMarkdown(configPath, opts = {}) {
   ].join("\n"));
 
   // ── Cover ─────────────────────────────────────────────────────────────────
-  if (opts.includeCover !== false && rawConfig.cover) {
+  if (opts.includeCover !== false && typeof rawConfig.cover === "string" && rawConfig.cover) {
     const coverPath = path.resolve(projectDir, rawConfig.cover);
     if (fs.existsSync(coverPath)) {
       const ext = path.extname(coverPath).toLowerCase();

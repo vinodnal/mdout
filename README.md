@@ -150,17 +150,6 @@ mdoc/
 ├── package.json
 └── node_modules/
 ```
-│
-├── projects/
-│   └── my-project/
-│       ├── project.config.js   ← required
-│       ├── index.md
-│       └── figures/
-│           └── chart.js
-│
-├── package.json
-└── node_modules/
-```
 
 ---
 
@@ -473,5 +462,5 @@ Starter templates are available under `src/templates/`:
 Create a new project from a template:
 
 ```bash
-node build.js --init thesis projects/my-thesis
+mdoc init --template thesis projects/my-thesis
 ```

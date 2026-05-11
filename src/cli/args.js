@@ -9,6 +9,43 @@
 
 const { die } = require("./utils");
 
+const EXPORT_FORMAT_ALIASES = {
+  images: "images",
+  png: "images",
+  jpg: "images",
+  md: "md",
+  markdown: "md",
+};
+
+function parseVarPair(pairRaw) {
+  const pair = pairRaw || "";
+  const eqIdx = pair.indexOf("=");
+  if (eqIdx <= 0) die(`--var requires key=value format, got: "${pair || "(empty)"}"`);
+  const key = pair.slice(0, eqIdx).trim();
+  const value = pair.slice(eqIdx + 1);
+  if (!key) die("--var key cannot be empty.");
+  return { key, value };
+}
+
+function addExportFormatToken(opts, tokenRaw, sourceFlag) {
+  const token = String(tokenRaw || "").toLowerCase();
+  if (!token) die(`${sourceFlag} requires a value (images|md|png|jpg).`);
+
+  const canonical = EXPORT_FORMAT_ALIASES[token];
+  if (!canonical) {
+    die(`Unknown format "${token}". Use images|md|png|jpg.`);
+  }
+
+  if (!opts.formats.includes(canonical)) opts.formats.push(canonical);
+
+  if (token === "png" || token === "jpg") {
+    if (opts.imageFormat && opts.imageFormat !== token) {
+      die(`Conflicting image format: ${sourceFlag} ${token} conflicts with --image-format ${opts.imageFormat}.`);
+    }
+    opts.imageFormat = token;
+  }
+}
+
 // ─── Build ────────────────────────────────────────────────────────────────────
 
 /**
@@ -49,7 +86,7 @@ function parseBuildArgs(args) {
 
       case "--watch-debounce": {
         const val = Number(args[++i]);
-        if (!Number.isFinite(val)) die("--watch-debounce requires a number (ms).");
+        if (!Number.isFinite(val) || val < 0) die("--watch-debounce requires a non-negative number (ms).");
         opts.watchDebounce = val;
         break;
       }
@@ -67,12 +104,7 @@ function parseBuildArgs(args) {
       }
 
       case "--var": {
-        const pair   = args[++i] || "";
-        const eqIdx  = pair.indexOf("=");
-        if (eqIdx <= 0) die(`--var requires key=value format, got: "${pair || "(empty)"}"`);
-        const key    = pair.slice(0, eqIdx).trim();
-        const value  = pair.slice(eqIdx + 1);
-        if (!key)    die(`--var key cannot be empty.`);
+        const { key, value } = parseVarPair(args[++i]);
         opts.vars[key] = value;
         break;
       }
@@ -181,15 +213,16 @@ function parseExportArgs(args) {
       case "--no-cover":           opts.noCover   = true; break;
 
       case "-f": case "--format": {
-        const fmt = (args[++i] || "").toLowerCase();
-        if (!fmt) die("--format requires a value (images|md).");
-        if (!opts.formats.includes(fmt)) opts.formats.push(fmt);
+        addExportFormatToken(opts, args[++i], "--format");
         break;
       }
 
       case "--image-format": {
         const f = (args[++i] || "").toLowerCase();
         if (f !== "png" && f !== "jpg") die("--image-format must be png or jpg.");
+        if (opts.formats.includes("images") && opts.imageFormat && opts.imageFormat !== f) {
+          die(`Conflicting image format: --image-format ${f} conflicts with shorthand format ${opts.imageFormat}.`);
+        }
         opts.imageFormat = f;
         break;
       }
@@ -238,12 +271,7 @@ function parseExportArgs(args) {
       }
 
       case "--var": {
-        const pair  = args[++i] || "";
-        const eqIdx = pair.indexOf("=");
-        if (eqIdx <= 0) die(`--var requires key=value format, got: "${pair || "(empty)"}"`);
-        const key   = pair.slice(0, eqIdx).trim();
-        const value = pair.slice(eqIdx + 1);
-        if (!key) die("--var key cannot be empty.");
+        const { key, value } = parseVarPair(args[++i]);
         opts.vars[key] = value;
         break;
       }
@@ -259,9 +287,8 @@ function parseExportArgs(args) {
         if (a.startsWith("-")) die(`Unknown option: ${a}\nRun 'mdoc export --help' for usage.`);
         // Positional: first = format shorthand (images/md/png/jpg) or project dir
         if (!opts.projectDir) {
-          const knownFormats = new Set(["images", "md", "markdown", "png", "jpg"]);
-          if (knownFormats.has(a.toLowerCase())) {
-            if (!opts.formats.includes(a.toLowerCase())) opts.formats.push(a.toLowerCase());
+          if (Object.prototype.hasOwnProperty.call(EXPORT_FORMAT_ALIASES, a.toLowerCase())) {
+            addExportFormatToken(opts, a, "format");
           } else {
             opts.projectDir = a;
           }

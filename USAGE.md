@@ -56,7 +56,7 @@ Available templates: `simple` | `report` | `thesis` | `manual`
 
 ```
 mdoc [build] [options] <project-dir>     Build DOCX (and optionally PDF)
-mdoc export [format] [options] <dir>     Export to images or flat Markdown
+mdoc export [format] [options] <project-dir>  Export to images or flat Markdown
 mdoc validate [options] <project-dir>    Validate imports and variables without building
 mdoc init [options] <new-dir>            Scaffold a new project from a template
 ```
@@ -179,6 +179,8 @@ mdoc export [format] [options] <project-dir>
 | `md` | `markdown` | Flatten the entire Markdown tree to one file |
 
 If no format is given, both `images` and `md` are produced.
+
+When exporting both formats in one command, avoid `--out` because images expect an output directory while markdown expects a file path.
 
 **Shared options:**
 

@@ -29,6 +29,7 @@ const { flattenToMarkdown }     = require("../exporter/markdown");
  * @param {string[]} args  Argument list after the "export" command word.
  */
 async function runExport(args) {
+  const startedAt = performance.now();
   const opts = parseExportArgs(args);
   if (opts.help) { process.stdout.write(makeHelp("export")); return; }
 
@@ -49,25 +50,45 @@ async function runExport(args) {
     die(`No project.config.js found in: ${target}`);
   }
 
+  if (opts.out && opts.formats.length > 1) {
+    die("--out is ambiguous when exporting multiple formats. Export one format at a time with --out.");
+  }
+
+  const summary = {
+    formats: [],
+    images: null,
+    markdown: null,
+    elapsedMs: 0,
+  };
+
   // ── Dispatch by format ────────────────────────────────────────────────────
 
-  for (const fmt_ of opts.formats) {
-    switch (fmt_) {
-      case "images":
-      case "png":
-      case "jpg": {
-        const imageFormat = (fmt_ === "jpg") ? "jpg" : (opts.imageFormat || "png");
-        await exportImages({ opts, log, configPath, target, isPdfInput, imageFormat });
+  for (const fmt of opts.formats) {
+    switch (fmt) {
+      case "images": {
+        const images = await exportImages({ opts, log, configPath, target, isPdfInput, imageFormat: opts.imageFormat || "png" });
+        summary.formats.push("images");
+        summary.images = images;
         break;
       }
       case "md":
       case "markdown": {
-        await exportMarkdown({ opts, log, configPath });
+        const markdown = await exportMarkdown({ opts, log, configPath });
+        summary.formats.push("md");
+        summary.markdown = markdown;
         break;
       }
       default:
-        die(`Unknown export format: "${fmt_}". Supported: images, md`);
+        die(`Unknown export format: "${fmt}". Supported: images, md`);
     }
+  }
+
+  summary.elapsedMs = Math.round(performance.now() - startedAt);
+
+  if (opts.jsonOutput) {
+    const jsonStr = JSON.stringify(summary, null, 2);
+    if (opts.jsonOutput === "-") process.stdout.write(jsonStr + "\n");
+    else fs.writeFileSync(path.resolve(opts.jsonOutput), jsonStr, "utf-8");
   }
 }
 
@@ -116,7 +137,7 @@ async function exportImages({ opts, log, configPath, target, isPdfInput, imageFo
   // ── Convert PDF pages → images ─────────────────────────────────────────
   const outDir = opts.out
     ? path.resolve(opts.out)
-    : path.join(path.dirname(pdfPath), "pages");
+    : path.join(path.dirname(pdfPath), "export", "images");
 
   const prefix = opts.prefix || path.basename(pdfPath, ".pdf");
 
@@ -141,11 +162,7 @@ async function exportImages({ opts, log, configPath, target, isPdfInput, imageFo
     `→ ${outDir}  ${C.dim}(${(performance.now() - t1).toFixed(0)} ms)${C.reset}`
   );
 
-  if (opts.jsonOutput) {
-    const jsonStr = JSON.stringify({ format: imageFormat, pages, outDir }, null, 2);
-    if (opts.jsonOutput === "-") process.stdout.write(jsonStr + "\n");
-    else fs.writeFileSync(path.resolve(opts.jsonOutput), jsonStr, "utf-8");
-  }
+  return { format: imageFormat, pages, outDir };
 }
 
 // ─── Markdown export ─────────────────────────────────────────────────────────
@@ -157,6 +174,7 @@ async function exportMarkdown({ opts, log, configPath }) {
   const result = await flattenToMarkdown(configPath, {
     out:          opts.out  ? path.resolve(opts.out) : undefined,
     includeCover: !opts.noCover,
+    vars:         opts.vars,
     logger:       log,
   });
 
@@ -166,11 +184,7 @@ async function exportMarkdown({ opts, log, configPath }) {
     `${C.dim}(${(result.byteLength / 1024).toFixed(1)} KB, ${(performance.now() - t0).toFixed(0)} ms)${C.reset}`
   );
 
-  if (opts.jsonOutput) {
-    const jsonStr = JSON.stringify({ ...result }, null, 2);
-    if (opts.jsonOutput === "-") process.stdout.write(jsonStr + "\n");
-    else fs.writeFileSync(path.resolve(opts.jsonOutput), jsonStr, "utf-8");
-  }
+  return result;
 }
 
 module.exports = { runExport };
