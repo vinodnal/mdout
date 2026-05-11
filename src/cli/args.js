@@ -136,4 +136,145 @@ function parseInitArgs(args) {
   return opts;
 }
 
-module.exports = { parseBuildArgs, parseValidateArgs, parseInitArgs };
+// ─── Export ──────────────────────────────────────────────────────────────────
+
+/**
+ * Parse export command arguments.
+ *
+ * Formats:  images (or png / jpg) | md (or markdown)
+ * Multiple formats can be requested in one run with repeated --format flags.
+ *
+ * @param {string[]} args
+ * @returns {object}
+ */
+function parseExportArgs(args) {
+  const opts = {
+    help:        false,
+    verbose:     false,
+    quiet:       false,
+    projectDir:  null,
+    formats:     [],          // ["images", "md", …]
+    // images options
+    imageFormat: "png",       // "png" | "jpg"
+    dpi:         150,
+    pages:       null,        // null = all, string = spec like "1,3-5"
+    prefix:      null,
+    pdftoppm:    null,
+    gs:          null,
+    soffice:     null,
+    skipBuild:   false,       // --no-build: skip DOCX build, use existing output
+    // md options
+    noCover:     false,
+    // shared
+    out:         null,
+    vars:        {},
+    jsonOutput:  null,
+  };
+
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    switch (a) {
+      case "-h": case "--help":    opts.help    = true; break;
+      case "-v": case "--verbose": opts.verbose = true; break;
+      case "-q": case "--quiet":   opts.quiet   = true; break;
+      case "--no-build":           opts.skipBuild = true; break;
+      case "--no-cover":           opts.noCover   = true; break;
+
+      case "-f": case "--format": {
+        const fmt = (args[++i] || "").toLowerCase();
+        if (!fmt) die("--format requires a value (images|md).");
+        if (!opts.formats.includes(fmt)) opts.formats.push(fmt);
+        break;
+      }
+
+      case "--image-format": {
+        const f = (args[++i] || "").toLowerCase();
+        if (f !== "png" && f !== "jpg") die("--image-format must be png or jpg.");
+        opts.imageFormat = f;
+        break;
+      }
+
+      case "--dpi": {
+        const v = Number(args[++i]);
+        if (!Number.isFinite(v) || v < 1) die("--dpi requires a positive number.");
+        opts.dpi = v;
+        break;
+      }
+
+      case "--pages": {
+        opts.pages = args[++i] || "";
+        if (!opts.pages) die("--pages requires a value (e.g. 1,3-5 or all).");
+        break;
+      }
+
+      case "--prefix": {
+        opts.prefix = args[++i] || "";
+        if (!opts.prefix) die("--prefix requires a value.");
+        break;
+      }
+
+      case "-o": case "--out": {
+        opts.out = args[++i];
+        if (!opts.out) die(`${a} requires a path argument.`);
+        break;
+      }
+
+      case "--soffice": {
+        opts.soffice = args[++i];
+        if (!opts.soffice) die("--soffice requires a path.");
+        break;
+      }
+
+      case "--pdftoppm": {
+        opts.pdftoppm = args[++i];
+        if (!opts.pdftoppm) die("--pdftoppm requires a path.");
+        break;
+      }
+
+      case "--gs": {
+        opts.gs = args[++i];
+        if (!opts.gs) die("--gs requires a path.");
+        break;
+      }
+
+      case "--var": {
+        const pair  = args[++i] || "";
+        const eqIdx = pair.indexOf("=");
+        if (eqIdx <= 0) die(`--var requires key=value format, got: "${pair || "(empty)"}"`);
+        const key   = pair.slice(0, eqIdx).trim();
+        const value = pair.slice(eqIdx + 1);
+        if (!key) die("--var key cannot be empty.");
+        opts.vars[key] = value;
+        break;
+      }
+
+      case "--json": {
+        const next = args[i + 1];
+        if (next && !next.startsWith("-")) { opts.jsonOutput = next; i++; }
+        else opts.jsonOutput = "-";
+        break;
+      }
+
+      default:
+        if (a.startsWith("-")) die(`Unknown option: ${a}\nRun 'mdoc export --help' for usage.`);
+        // Positional: first = format shorthand (images/md/png/jpg) or project dir
+        if (!opts.projectDir) {
+          const knownFormats = new Set(["images", "md", "markdown", "png", "jpg"]);
+          if (knownFormats.has(a.toLowerCase())) {
+            if (!opts.formats.includes(a.toLowerCase())) opts.formats.push(a.toLowerCase());
+          } else {
+            opts.projectDir = a;
+          }
+        } else {
+          die("Too many arguments.");
+        }
+    }
+  }
+
+  // Default to both formats if none specified
+  if (!opts.formats.length) opts.formats = ["images", "md"];
+
+  return opts;
+}
+
+module.exports = { parseBuildArgs, parseValidateArgs, parseInitArgs, parseExportArgs };

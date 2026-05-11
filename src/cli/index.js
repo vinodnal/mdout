@@ -7,10 +7,11 @@
 const { runBuild }    = require("./build");
 const { runValidate } = require("./validate");
 const { runInit }     = require("./init");
+const { runExport }   = require("./export");
 const { makeHelp }    = require("./help");
 const { C, getVersion, die } = require("./utils");
 
-const COMMANDS = new Set(["build", "validate", "init", "help", "--help", "-h", "--version", "version"]);
+const COMMANDS = new Set(["build", "validate", "init", "export", "help", "--help", "-h", "--version", "version"]);
 
 /**
  * Entry point — call with `process.argv`.
@@ -37,7 +38,7 @@ function run(argv) {
     return;
   }
 
-  const handlers = { build: runBuild, validate: runValidate, init: runInit };
+  const handlers = { build: runBuild, validate: runValidate, init: runInit, export: runExport };
   const handler  = handlers[cmd];
   if (!handler) {
     process.stderr.write(`Unknown command: ${cmd}\n`);

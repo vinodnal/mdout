@@ -53,6 +53,14 @@ const INLINE_RE = new RegExp([
 
 const BR_RE = /<br\s*\/?\s*>/gi;
 
+// ─── RTL Detection ────────────────────────────────────────────────────────────
+
+const ARABIC_RE = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+
+function hasArabic(text) {
+  return ARABIC_RE.test(String(text || ""));
+}
+
 // ─── Factory ──────────────────────────────────────────────────────────────────
 
 /**
@@ -133,7 +141,13 @@ function createInlineRenderer({ C, FONT, CODE_FONT, MATH_FONT, FS, CODE_FS, fsMa
   }
 
   function makeRun(text, overrides = {}) {
-    return new TextRun({ text, font: FONT, size: FS, color: C.BODY, ...overrides });
+    const isArabic = hasArabic(text);
+    const baseRun = { text, font: FONT, size: FS, color: C.BODY, ...overrides };
+    if (isArabic) {
+      baseRun.rightToLeft = true;
+      if (!baseRun.language) baseRun.language = { bidirectional: 'ar-SA', value: 'ar-SA' };
+    }
+    return new TextRun(baseRun);
   }
 
   function pushStyledRuns(segment, runs) {
@@ -196,7 +210,7 @@ function createInlineRenderer({ C, FONT, CODE_FONT, MATH_FONT, FS, CODE_FS, fsMa
     pushStyledRuns(source.slice(segmentStart), runs);
     return runs.length
       ? runs
-      : [new TextRun({ text: source, font: FONT, size: FS, color: C.BODY })];
+      : [new TextRun({ text: source, font: FONT, size: FS, color: C.BODY, ...(hasArabic(source) ? { rightToLeft: true, language: { bidirectional: 'ar-SA', value: 'ar-SA' } } : {}) })];
   }
 
   return { parseInlineRuns, pushStyledRuns, makeRun, resolveColor };

@@ -22,6 +22,47 @@ ${C.bold}Exit codes:${C.reset}
   1 — Validation errors found
 `;
 
+  if (cmd === "export") return `\
+${C.bold}mdoc export${C.reset} — Export a project to images or flat Markdown
+
+${C.bold}Usage:${C.reset}
+  mdoc export [format] [options] <project-dir|path.pdf>
+
+${C.bold}Formats:${C.reset}
+  images        Convert PDF pages to PNG/JPEG images (default when both omitted)
+  md            Flatten all Markdown into a single file
+  (Both formats are exported when no format is specified)
+
+${C.bold}Shared options:${C.reset}
+  -h, --help                  Show this help
+  -v, --verbose               Verbose output
+  -q, --quiet                 Suppress all output except errors
+  -f, --format <name>         Explicit format (images|md), repeatable
+  -o, --out <path>            Output directory (images) or file path (md)
+      --no-build              Skip DOCX build — use existing output DOCX/PDF
+      --soffice <path>        Override LibreOffice soffice path
+      --var <key=value>       Override project.config.js variable (repeatable)
+      --json [path]           Write export result as JSON (omit path → stdout)
+
+${C.bold}Images options:${C.reset}
+      --pages <spec>          Pages to export: 1,3-5,7 | 2- | -4 | all (default: all)
+      --image-format <fmt>    png | jpg (default: png)
+      --dpi <n>               Resolution in DPI (default: 150)
+      --prefix <name>         Output file name prefix
+      --pdftoppm <path>       Override pdftoppm binary path
+      --gs <path>             Override Ghostscript binary path
+
+${C.bold}Markdown options:${C.reset}
+      --no-cover              Omit cover.md from the flat output
+
+${C.bold}Examples:${C.reset}
+  mdoc export projects/my-thesis
+  mdoc export images --pages 1,3-5 --dpi 200 projects/my-thesis
+  mdoc export images --pages 7 projects/these-hmh2/these_hmh2.pdf
+  mdoc export md --out ./thesis_flat.md projects/my-thesis
+  mdoc export images md --no-build --out ./out projects/my-thesis
+`;
+
   if (cmd === "init") return `\
 ${C.bold}mdoc init${C.reset} — Scaffold a new project
 
@@ -42,6 +83,7 @@ ${C.bold}mdoc${C.reset} — Markdown → DOCX/PDF document builder  v${getVersio
 
 ${C.bold}Usage:${C.reset}
   mdoc [build] [options] <project-dir>
+  mdoc export [format] [options] <project-dir>
   mdoc validate [--dep-graph] <project-dir>
   mdoc init [--template <name>] <new-dir>
 
@@ -65,6 +107,9 @@ ${C.bold}Examples:${C.reset}
   mdoc --var author="Jane Doe" --var year=2026 projects/my-thesis
   mdoc --json result.json projects/my-thesis
   mdoc validate projects/my-thesis
+  mdoc export projects/my-thesis
+  mdoc export images --pages 1-5 --dpi 200 projects/my-thesis
+  mdoc export md --out ./flat.md projects/my-thesis
   mdoc init --template thesis ./projects/new-thesis
 `;
 }

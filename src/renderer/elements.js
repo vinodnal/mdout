@@ -15,6 +15,16 @@ const {
 const { latexToMathParagraph }   = require("../math");
 const { readImageDimensions }    = require("./image-utils");
 
+// ─── RTL Detection ────────────────────────────────────────────────────────────
+
+const ARABIC_RE = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+
+function hasArabic(text) {
+  return ARABIC_RE.test(String(text || ""));
+}
+
+// ─── Caption labels ───────────────────────────────────────────────────────────
+
 const CAPTION_LABELS = {
   figure: "Figure",
   table:  "Tableau",
@@ -100,18 +110,35 @@ function createElementsRenderer({
   }
 
   function makeElementTitle(kind, title, opts = {}) {
-    return new Paragraph({
+    const captionText = makeCaptionText(title, { ...opts, kind });
+    const isArabic = hasArabic(captionText);
+    const para = {
       style:     "Caption",
-      alignment: opts.alignment,
-      children:  parseInlineRuns(makeCaptionText(title, { ...opts, kind })),
-    });
+      alignment: isArabic ? AlignmentType.RIGHT : opts.alignment,
+      children:  parseInlineRuns(captionText),
+    };
+    if (isArabic) {
+      para.bidirectional = true;
+    }
+    return new Paragraph(para);
   }
 
   // ── Block elements ────────────────────────────────────────────────────────
 
   function makeParagraph(text, opts = {}) {
+    const appliedText = applyVars(text);
+    const isArabic = hasArabic(appliedText);
+    if (isArabic) {
+      return new Paragraph({
+        style:         "ArabicParagraph",
+        bidirectional: true,
+        alignment:     AlignmentType.RIGHT,
+        children:      parseInlineRuns(appliedText),
+        indent:        opts.indent,
+      });
+    }
     return new Paragraph({
-      children:  parseInlineRuns(applyVars(text)),
+      children:  parseInlineRuns(appliedText),
       spacing:   { line: SP.paragraphLine, after: SP.paragraphAfter },
       alignment: opts.alignment,
       indent:    opts.indent,
@@ -128,10 +155,21 @@ function createElementsRenderer({
       .replace(/^(?:[IVXivx]+\s*[-\u2013]\s*|\d+(?:\.\d+)*[.]\s*|\d+(?:\.\d+)+\s+|\d+\s*[-\u2013]\s*|[a-e][)]\s*)/, "")
       .trim();
     const clampedLevel = Math.max(1, Math.min(4, level || 1));
+    const isArabic = hasArabic(clean);
+    if (isArabic && opts.nonumber) {
+      return new Paragraph({
+        style:   "ArabicHeadingNoToc",
+        children: [new TextRun({ text: clean, rightToLeft: true })],
+        pageBreakBefore: opts.pageBreakBefore || false,
+      });
+    }
     const para = {
-      alignment: opts.alignment ?? (opts.nonumber ? AlignmentType.CENTER : undefined),
+      alignment: opts.alignment ?? (isArabic ? AlignmentType.RIGHT : (opts.nonumber ? AlignmentType.CENTER : undefined)),
       children:  [new TextRun(clean)],
     };
+    if (isArabic) {
+      para.bidirectional = true;
+    }
     if (!opts.nonumber) {
       para.heading   = lvlMap[clampedLevel] || HeadingLevel.HEADING_1;
       para.numbering = { reference: "headings", level: Math.max(0, Math.min(3, (level || 1) - 1)) };
@@ -144,20 +182,31 @@ function createElementsRenderer({
 
   function makeCaption(text, opts = {}) {
     const clean = String(text || "").replace(/^\*/, "").replace(/\*$/, "").trim();
-    return new Paragraph({
+    const captionText = makeCaptionText(clean, opts);
+    const isArabic = hasArabic(captionText);
+    const para = {
       style:     "Caption",
-      alignment: opts.alignment,
-      children:  parseInlineRuns(makeCaptionText(clean, opts)),
-    });
+      alignment: isArabic ? AlignmentType.RIGHT : opts.alignment,
+      children:  parseInlineRuns(captionText),
+    };
+    if (isArabic) {
+      para.bidirectional = true;
+    }
+    return new Paragraph(para);
   }
 
   function makeBlockquote(text, opts = {}) {
     const clean = text.replace(/^>\s*/, "").trim();
-    return new Paragraph({
+    const isArabic = hasArabic(clean);
+    const para = {
       style:     "Blockquote",
-      alignment: opts.alignment,
+      alignment: isArabic ? AlignmentType.RIGHT : opts.alignment,
       children:  parseInlineRuns(clean),
-    });
+    };
+    if (isArabic) {
+      para.bidirectional = true;
+    }
+    return new Paragraph(para);
   }
 
   function makeMathParagraph(formula) {
