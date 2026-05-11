@@ -267,7 +267,6 @@ function validateConfig(raw) {
 
   // ── 4. theme.colors ───────────────────────────────────────────────────────
   for (const [key, val] of Object.entries(cfg.theme.colors)) {
-    if (key === "note" && Array.isArray(val)) continue; // Skip duplicate "note" edge case
     if (typeof val !== "string")
       e(`theme.colors.${key}`, `Must be a 6-digit hex string without #, got ${JSON.stringify(val)}`);
     else if (!HEX_RE.test(val))

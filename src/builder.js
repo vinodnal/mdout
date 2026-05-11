@@ -280,6 +280,8 @@ function collectTocEntries(entryPath) {
   return entries;
 }
 
+const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"]);
+
 // ─── First-pass: collect element (figure/table/annex) entries ────────────────
 
 function collectElementEntries(entryPath) {
@@ -434,8 +436,6 @@ function collectElementEntries(entryPath) {
   visit(entryPath, new Set());
   return entries;
 }
-
-const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"]);
 
 // ─── Cover page builders ──────────────────────────────────────────────────────
 
@@ -658,8 +658,18 @@ async function buildFromConfig(rawConfig, opts = {}) {
       sectionFooter = buildFooter({ footer: fCfg }, cfg.theme.colors || {}, R.FONT, cfg.theme.fontSize || {});
     }
 
-    // Only filter real docx-elements (exclude any stray ALTCHUNK markers for now)
-    const children = segment.elements.filter(el => el && !el._type);
+    // Filter real docx-elements; warn about unsupported ALTCHUNK markers.
+    const children = segment.elements.filter(el => {
+      if (!el) return false;
+      if (el._type === "ALTCHUNK") {
+        log.warn(
+          `DOCX embed (type: embed) is not yet supported — "${el.relPath}" was skipped. Use type: extract instead.`,
+          "W001"
+        );
+        return false;
+      }
+      return !el._type;
+    });
 
     docSections.push({
       properties: {

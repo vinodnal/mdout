@@ -140,7 +140,7 @@ async function validate(configPath, opts = {}) {
   if (typeof cfg.cover === "string") {
     const coverAbs = path.resolve(configDir, cfg.cover);
     if (!fs.existsSync(coverAbs)) {
-      results.warnings.push({ code: "E001", message: `Cover file not found: ${cfg.cover}`, file: coverAbs });
+      results.warnings.push({ code: "W001", message: `Cover file not found: ${cfg.cover}`, file: coverAbs });
     } else {
       results.imports.push({ from: absConfig, to: coverAbs, exists: true });
       const coverVars = Object.fromEntries(Object.entries(cfg.vars || {}).map(([k, v]) => [k, String(v)]));

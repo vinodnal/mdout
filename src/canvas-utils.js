@@ -210,6 +210,14 @@ function saveAndPrint(canvas, outputPath) {
   out.on("finish", () => {
     process.stdout.write(outputPath);
   });
+  out.on("error", (err) => {
+    process.stderr.write(`saveAndPrint error: ${err.message}\n`);
+    process.exit(1);
+  });
+  stream.on("error", (err) => {
+    process.stderr.write(`PNG stream error: ${err.message}\n`);
+    process.exit(1);
+  });
 }
 
 module.exports = {
