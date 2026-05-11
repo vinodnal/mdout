@@ -17,40 +17,13 @@
  */
 "use strict";
 
-const fs   = require("fs");
-const path = require("path");
+const fs         = require("fs");
+const path       = require("path");
 const { execSync } = require("child_process");
 
+const { retrySync } = require("./utils");
+
 const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"]);
-
-function sleepSync(ms) {
-  if (ms <= 0) return;
-  const shared = new SharedArrayBuffer(4);
-  const view = new Int32Array(shared);
-  Atomics.wait(view, 0, 0, ms);
-}
-
-function isTransientFsError(err) {
-  return err && ["EPERM", "EBUSY", "EACCES", "ETXTBSY", "EMFILE", "ENFILE"].includes(err.code);
-}
-
-function retrySync(fn, opts = {}) {
-  const retries = opts.retries ?? 5;
-  const baseDelay = opts.delay ?? 50;
-  let delay = baseDelay;
-  let lastErr;
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      return fn();
-    } catch (err) {
-      lastErr = err;
-      if (!isTransientFsError(err) || attempt === retries) throw err;
-      sleepSync(delay);
-      delay = Math.min(delay * 2, 500);
-    }
-  }
-  throw lastErr;
-}
 
 function extractDocxTextSync(absPath) {
   const script = [

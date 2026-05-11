@@ -56,7 +56,7 @@ const DEFAULTS = {
       tipBg:       "E8F5E9",
       danger:      "B71C1C",
       dangerBg:    "FFEBEE",
-      note:        "4A4A4A",
+      // noteBg: callout-note background (border uses theme.colors.note)
       noteBg:      "F5F5F5",
     },
     fonts: {
@@ -320,8 +320,26 @@ function validateConfig(raw) {
       if (typeof sec !== "object" || sec === null) {
         e(`sections[${i}]`, "Must be an object"); return;
       }
+      if (sec.id !== undefined && typeof sec.id !== "string")
+        e(`sections[${i}].id`, "Must be a string identifier");
       if (sec.orientation !== undefined && !ORIENTATIONS.includes(sec.orientation))
         e(`sections[${i}].orientation`, `Must be one of: ${ORIENTATIONS.join(", ")}`);
+      if (sec.margin !== undefined) {
+        if (typeof sec.margin === "number") {
+          if (sec.margin <= 0) e(`sections[${i}].margin`, "Must be a positive number (mm)");
+        } else if (typeof sec.margin === "object" && sec.margin !== null) {
+          for (const side of ["top", "right", "bottom", "left"]) {
+            if (sec.margin[side] !== undefined && (typeof sec.margin[side] !== "number" || sec.margin[side] < 0))
+              e(`sections[${i}].margin.${side}`, "Must be a non-negative number (mm)");
+          }
+        } else {
+          e(`sections[${i}].margin`, "Must be a number (mm) or { top, right, bottom, left }");
+        }
+      }
+      if (sec.header !== undefined && typeof sec.header !== "string" && (typeof sec.header !== "object" || sec.header === null))
+        e(`sections[${i}].header`, "Must be a string or header object");
+      if (sec.footer !== undefined && typeof sec.footer !== "string" && (typeof sec.footer !== "object" || sec.footer === null))
+        e(`sections[${i}].footer`, "Must be a string or footer object");
       if (sec.pageNumbers !== undefined) {
         if (typeof sec.pageNumbers !== "object" || sec.pageNumbers === null) {
           e(`sections[${i}].pageNumbers`, "Must be an object { start?, format? }");

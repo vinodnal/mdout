@@ -26,11 +26,12 @@ const {
   PageNumber, NumberFormat, SectionType,
 } = require("docx");
 
-const { validateConfig }  = require("./schema");
-const { createRenderer }  = require("./renderer");
-const { parseMD }         = require("./parser");
-const { createImporter }  = require("./importer");
-const { makeNullLogger }  = require("./logger");
+const { validateConfig }    = require("./schema");
+const { createRenderer }    = require("./renderer");
+const { parseMD }           = require("./parser");
+const { createImporter }    = require("./importer");
+const { makeNullLogger }    = require("./logger");
+const { retrySync }         = require("./utils");
 
 // ─── Page sizes (DXA: 1 inch = 1440 DXA) ────────────────────────────────────
 
@@ -49,40 +50,16 @@ const PAGE_FORMAT_MAP = {
 };
 
 const ALIGN_MAP = {
-  left:   AlignmentType.LEFT,
-  center: AlignmentType.CENTER,
-  right:  AlignmentType.RIGHT,
-  justify: AlignmentType.JUSTIFIED,
+  left:      AlignmentType.LEFT,
+  center:    AlignmentType.CENTER,
+  right:     AlignmentType.RIGHT,
+  justify:   AlignmentType.JUSTIFIED,
   justified: AlignmentType.JUSTIFIED,
 };
 
 function mmToDXA(mm) { return Math.round(mm * 56.69); }
 
-function sleepSync(ms) {
-  if (ms <= 0) return;
-  const shared = new SharedArrayBuffer(4);
-  const view = new Int32Array(shared);
-  Atomics.wait(view, 0, 0, ms);
-}
-
-function isTransientFsError(err) {
-  return err && ["EPERM", "EBUSY", "EACCES", "ETXTBSY", "EMFILE", "ENFILE"].includes(err.code);
-}
-
-function retrySync(fn, retries = 5, baseDelay = 50) {
-  let delay = baseDelay, lastErr;
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try { return fn(); } catch (err) {
-      lastErr = err;
-      if (!isTransientFsError(err) || attempt === retries) throw err;
-      sleepSync(delay);
-      delay = Math.min(delay * 2, 500);
-    }
-  }
-  throw lastErr;
-}
-
-function readTextFile(filePath)   { return retrySync(() => fs.readFileSync(filePath, "utf-8")); }
+function readTextFile(filePath) { return retrySync(() => fs.readFileSync(filePath, "utf-8")); }
 
 function hasNoNumberModifier(text) {
   const value = String(text || "");

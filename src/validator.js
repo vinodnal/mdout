@@ -67,7 +67,8 @@ function crawl(filePath, availableVars, results, visitStack, visited) {
         const absImport = path.resolve(dir, relPath);
         const ext       = path.extname(absImport).toLowerCase();
 
-        if (!fs.existsSync(absImport)) {
+        const exists = fs.existsSync(absImport);
+        if (!exists) {
           results.errors.push({
             code:    "E001",
             message: `Import not found: ${relPath}`,
@@ -77,7 +78,7 @@ function crawl(filePath, availableVars, results, visitStack, visited) {
         } else if (ext === ".md" || ext === ".txt") {
           crawl(absImport, Object.fromEntries([...localVars].map(k => [k, ""])), results, visitStack, visited);
         }
-        results.imports.push({ from: normalized, to: absImport, exists: fs.existsSync(absImport) });
+        results.imports.push({ from: normalized, to: absImport, exists });
       }
       continue;
     }
