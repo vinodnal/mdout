@@ -12,7 +12,8 @@ const {
   Bookmark, BookmarkType,
 } = require("docx");
 
-const { latexToMathParagraph } = require("../math");
+const { latexToMathParagraph }   = require("../math");
+const { readImageDimensions }    = require("./image-utils");
 
 const CAPTION_LABELS = {
   figure: "Figure",
@@ -309,23 +310,7 @@ function createElementsRenderer({
   }
 
   function makeImage(data, ext, opts = {}) {
-    let dims = { width: 480, height: 320 };
-    // PNG
-    if (data[0] === 0x89 && data[1] === 0x50) {
-      dims = { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
-    // JPEG
-    } else if (data[0] === 0xFF && data[1] === 0xD8) {
-      let pos = 2;
-      while (pos < data.length - 8) {
-        if (data[pos] !== 0xFF) { pos++; continue; }
-        const mk = data[pos + 1];
-        if (mk >= 0xC0 && mk <= 0xCF && mk !== 0xC4 && mk !== 0xCC) {
-          dims = { width: data.readUInt16BE(pos + 7), height: data.readUInt16BE(pos + 5) }; break;
-        }
-        if (pos + 4 >= data.length) break;
-        pos += 2 + data.readUInt16BE(pos + 2);
-      }
-    }
+    const dims = readImageDimensions(data);
     const maxPx  = opts.width ? Math.max(1, parseInt(opts.width) || 1) : Math.round(CONTENT_W / 15);
     const safeW  = dims.width  || 480;
     const safeH  = dims.height || 320;
