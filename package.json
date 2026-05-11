@@ -14,6 +14,12 @@
     "README.md",
     "USAGE.md"
   ],
+  "scripts": {
+    "start": "node bin/mdoc.js",
+    "validate": "node bin/mdoc.js validate",
+    "build:example": "node bin/mdoc.js --no-pdf projects/these-hmh2",
+    "build:example:pdf": "node bin/mdoc.js projects/these-hmh2"
+  },
   "keywords": [
     "markdown",
     "docx",
@@ -28,6 +34,7 @@
     "report",
     "thesis"
   ],
+  "author": "",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"

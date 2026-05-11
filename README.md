@@ -1,75 +1,90 @@
-# doc-builder
+# mdoc
 
-A generic **Markdown → DOCX** document building framework for Node.js.
+> **Markdown → DOCX / PDF document builder** for Node.js — write your documents in plain Markdown, configure once, compile to a polished Word document and PDF.
 
-Write your document content in Markdown, configure a project with a `project.config.js`, and run a single command to produce a polished `.docx` (and optionally a PDF via LibreOffice).
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 ---
 
 ## Features
 
-- **Markdown to DOCX** — headings, paragraphs, bold/italic/code inline, inline `<br>` line breaks, blockquotes, bulleted and numbered lists
-- **Automatic heading numbering** — H1 headings numbered in Roman numerals (I, II, III…), sub-headings in hierarchical decimals (1., 1.1., 1.1.1.); add `{.no-num}` to any heading to opt out
-- **Tables** — pipe-syntax tables with proportional column widths, styled header row, alternating row colors
-- **Robust table parsing** — escaped pipes (`\\|`) and pipes inside inline math/code do not break table cells
-- **Math formulas** — `$$LaTeX$$` blocks rendered with Unicode fallback
-- **Fenced code blocks** — styled with monospace font and accent border
-- **Image embedding** — `![alt](path)` and `@import` directives for PNG/JPEG
-- **Script-generated figures** — `@import` can run a `.js` script that draws and outputs a PNG (via `canvas`)
-- **File imports** — `@import` can embed other `.md` files inline (recursive)
-- **Theme system** — configure colors, fonts, and font size per project
-- **Page layout** — A4 / Letter / A3 or custom size, configurable margins
-- **Cover page** — a regular Markdown file rendered as a separate cover section with the same parser as body pages
-- **Header & footer** — with automatic page numbers
-- **Watch mode** — debounced rebuilds while you edit, with Windows-friendly file-lock handling
-- **Auto-numbered element titles** — figures, tables, and annex titles can be declared with a type tag and numbered automatically
+- **Markdown to DOCX** — headings, paragraphs, bold/italic/underline/strikethrough/code inline, `<br>` line breaks, blockquotes, bulleted and numbered lists (nested)
+- **Automatic heading numbering** — H1 in Roman numerals (I, II, III…), sub-headings in hierarchical decimals (1., 1.1., 1.1.1.); opt out with `{.no-num}` on any heading
+- **Tables** — pipe-syntax tables with proportional column widths, styled header row, alternating row colors; handles escaped pipes and pipes inside math/code
+- **Math formulas** — `$$…$$` blocks rendered as native Word OMML equations; `$…$` inline math via Unicode; falls back gracefully with W004
+- **Fenced code blocks** — styled with monospace font, code color, and accent border
+- **Callout / admonition blocks** — `<!-- @style: info|warning|tip|danger|note|box|quote -->` before any paragraph or blockquote
+- **Image embedding** — `![alt](path)` and `<!-- @import -->` for PNG/JPEG/GIF/WebP/BMP
+- **Script-generated figures** — `<!-- @import: chart.js -->` executes a Node/Python/TS script that draws a canvas and outputs a PNG path
+- **Recursive file imports** — `<!-- @import: chapter.md -->` embeds Markdown files (circular-import detection E003)
+- **Word document import** — embed `.docx` files via AltChunk (`embed`) or extract text via mammoth (`extract`)
+- **Template variable substitution** — define `vars` in config, reference as `{{name}}`; override per-file with `<!-- @var: key = value -->`
+- **Inline styling** — `{color:X}`, `{font:Name}`, `{size:N}`, `{bg:X}`, `{style:…}` spans; shorthand `{b}`, `{i}`, `{u}`, `{s}`; superscript `^…^` and subscript `~…~`; `==highlight==`
+- **Multi-section documents** — `<!-- @section: orientation: landscape | id: annexes -->` splits the document into distinct Word sections with individual page settings
+- **Word bookmarks / anchors** — `<!-- @anchor: id: name -->` inserts named bookmarks for cross-references
+- **Auto-numbered captions** — `<!-- @element: type: figure|table|annex | title: … -->` numbers elements globally; `<!-- @list: figures|tables|annexes -->` inserts a collected list
+- **Table of contents** — `<!-- @toc -->` inserts a ToC built from all headings; configurable depth and title
+- **Theme system** — full control over colors, fonts, font sizes, and spacing per project
+- **Page layout** — A4 / Letter / A3 or custom mm dimensions; per-section orientation and margins; configurable page numbering format and start value
+- **Cover page** — Markdown file or built-in cover builder (array of styled text entries and spacers)
+- **Rich headers/footers** — simple text or full run-level control with bold/italic/color/field substitution (`PAGE_CURRENT`, `PAGE_TOTAL`); per-section override
+- **Watch mode** — `--watch` debounced rebuilds while you edit; Windows-friendly file-lock retry
+- **PDF generation** — via LibreOffice on Linux/macOS; tries Microsoft Word COM first on Windows
 
 ---
 
 ## Requirements
 
 - **Node.js** v18+
-- **npm** packages: `docx`, `canvas` (install once at root)
-
-```bash
-npm install
-```
+- **LibreOffice** (optional) — for PDF generation
 
 > `canvas` requires native binaries. On Windows you may need the [GTK runtime](https://github.com/nicowillis/node-canvas-prebuilt#windows).
+
+---
+
+## Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Make the mdoc command available globally (optional)
+npm install -g .
+```
 
 ---
 
 ## Quick Start
 
 ```bash
+# Scaffold a new project from a template
+mdoc init --template thesis ./my-thesis
+mdoc init --template report ./reports/q1
+
 # Build a project (generates DOCX + PDF)
-node build.js projects/etude-bibliographique
+mdoc projects/my-thesis
 
-# Output: projects/etude-bibliographique/etude_bibliographique.docx
-#         projects/etude-bibliographique/etude_bibliographique.pdf
+# DOCX only (no PDF)
+mdoc --no-pdf projects/my-thesis
 
-# Show help and all CLI options
-node build.js --help
+# Verbose output with per-step timings
+mdoc -v projects/my-thesis
 
-# Build with verbose logging and timings
-node build.js -v projects/etude-bibliographique
+# Watch files and rebuild after changes
+mdoc --watch --no-pdf projects/my-thesis
 
-# Watch files and rebuild after changes settle
-node build.js --watch --no-pdf projects/etude-bibliographique
+# Convert an existing DOCX to PDF (no rebuild)
+mdoc --pdf-only projects/my-thesis
 
-# Generate a real table of contents page in Markdown
-<!-- @toc -->
+# Override output path
+mdoc -o ./dist/output.docx projects/my-thesis
 
-# Auto-number a figure, table, or annex title
-<!-- @element: figure | title: Comparaison des performances -->
-<!-- @element: table | title: Indicateurs globaux -->
-<!-- @element: annex | title: Structure du jeu de donnees exploite -->
+# Validate imports and variables without building
+mdoc validate projects/my-thesis
 
-# Build DOCX only (skip PDF)
-node build.js --no-pdf projects/etude-bibliographique
-
-# Convert an existing DOCX to PDF
-node build.js --pdf-only projects/etude-bibliographique
+# Show all CLI options
+mdoc --help
 ```
 
 ---
@@ -77,27 +92,40 @@ node build.js --pdf-only projects/etude-bibliographique
 ## Project Structure
 
 ```
-doc-builder/
+mdoc/
 ├── src/
+│   ├── cli.js             — CLI argument parsing and commands
+│   ├── builder.js         — Assembles Document from config
 │   ├── renderer.js        — Theme-aware docx element factory
 │   ├── parser.js          — Markdown → docx elements
 │   ├── importer.js        — @import directive handler
-│   ├── builder.js         — Assembles Document from config
 │   ├── canvas-utils.js    — Shared canvas drawing primitives for figure scripts
 │   ├── latex.js           — LaTeX → Unicode conversion
-│   ├── math.js            — Math rendering helpers
+│   ├── math.js            — Math rendering helpers (LaTeX → OMML)
 │   ├── schema.js          — Config validation and defaults
-│   ├── validator.js       — Input validation utilities
-│   ├── logger.js          — Logging utilities
-│   ├── pdf.js             — DOCX → PDF conversion
-│   ├── cli.js             — CLI argument parsing
-│   ├── index.js           — Public API
-│   └── templates/         — Starter project templates
+│   ├── validator.js       — Pre-build validation (imports, variables)
+│   ├── logger.js          — Structured logger with warning/error codes
+│   ├── utils.js           — Shared utilities (retry, fs helpers)
+│   ├── pdf.js             — DOCX → PDF conversion (LibreOffice / Word COM)
+│   ├── index.js           — Public programmatic API
+│   └── templates/         — Starter project templates (simple, report, thesis, manual)
 │
 ├── bin/
-│   └── mdoc.js            — Executable entry point
+│   └── mdoc.js            — CLI executable entry point
 │
-├── build.js               — Convenience CLI wrapper
+├── core/                  — ⚠ Backward-compat shims (deprecated, delegate to src/)
+│
+├── build.js               — Legacy CLI wrapper (delegates to bin/mdoc.js)
+│
+├── projects/              — Your document projects (git-ignored)
+│   └── my-project/
+│       ├── project.config.js
+│       ├── index.md
+│       └── figures/
+│
+├── package.json
+└── node_modules/
+```
 │
 ├── projects/
 │   └── my-project/
@@ -229,8 +257,8 @@ module.exports = {
 4. Build:
 
 ```bash
-node build.js projects/my-report
-# Output: my-report.docx and my-report.pdf
+mdoc projects/my-report
+# Output: my-report.docx and my-report.pdf (if LibreOffice is available)
 ```
 
 For detailed config schema and advanced features, see [USAGE.md](USAGE.md).
@@ -296,29 +324,38 @@ u.saveAndPrint(canvas, OUT);
 ## CLI Reference
 
 ```
-node build.js [options] <project-dir>
+mdoc [build] [options] <project-dir>
+mdoc validate [--dep-graph] <project-dir|config-path>
+mdoc init [--template <name>] <new-dir>
 
 Options:
-  -h, --help           Show help and exit
-  --version            Print version
-  -v, --verbose        Per-step timings and debug output
-  -q, --quiet          Suppress output except errors
-  -p, --pdf            Generate PDF (on by default)
-  --pdf-only           Convert existing DOCX to PDF without rebuild
-  --no-pdf             Skip PDF generation
-  -o, --out <path>     Override output path from config
-  --soffice <path>     Path to soffice executable (auto-detected)
+  -h, --help              Show help and exit
+      --version           Print version
+  -v, --verbose           Per-step timings and debug output
+  -q, --quiet             Suppress output except errors
+  -p, --pdf               Generate PDF (on by default)
+      --pdf-only          Convert existing DOCX to PDF without rebuild
+      --no-pdf            Skip PDF generation
+  -o, --out <path>        Override output path from config
+      --soffice <path>    Path to soffice executable (auto-detected)
+      --watch             Rebuild on file changes (debounced)
+      --watch-debounce N  Debounce delay in ms (default: 300)
 ```
 
 **Examples:**
 ```bash
-node build.js projects/my-report              # DOCX + PDF
-node build.js -v --no-pdf projects/my-report  # DOCX only, verbose
-node build.js --pdf-only projects/my-report   # PDF from existing DOCX
-node build.js -o ./dist/output.docx projects/my-report
+mdoc projects/my-report                    # DOCX + PDF
+mdoc -v --no-pdf projects/my-report        # DOCX only, verbose
+mdoc --pdf-only projects/my-report         # PDF from existing DOCX
+mdoc -o ./dist/output.docx projects/my-report
+mdoc --watch projects/my-thesis            # watch mode
+mdoc validate projects/my-report           # validate only, no build
+mdoc init --template thesis ./new-thesis   # scaffold from template
 ```
 
-> **Note:** PDF generation requires [LibreOffice](https://www.libreoffice.org/) and `soffice` on PATH.
+> **Note:** PDF generation requires [LibreOffice](https://www.libreoffice.org/) (`soffice` on PATH). On Windows, if Microsoft Word is installed, it is tried first.
+
+> **Backward compat:** `node build.js <project-dir>` still works (delegates to `mdoc`).
 
 ---
 
