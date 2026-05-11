@@ -31,6 +31,9 @@
 - **Rich headers/footers** — simple text or full run-level control with bold/italic/color/field substitution (`PAGE_CURRENT`, `PAGE_TOTAL`); per-section override
 - **Watch mode** — `--watch` debounced rebuilds while you edit; Windows-friendly file-lock retry
 - **PDF generation** — via LibreOffice on Linux/macOS; tries Microsoft Word COM first on Windows
+- **Export to images** — `mdoc export images` converts any project's PDF to PNG/JPEG pages via pdftoppm (preferred) or Ghostscript; select pages with `--pages 1,3-5`, set DPI with `--dpi`, choose format with `--image-format`
+- **Export to flat Markdown** — `mdoc export md` flattens all imported Markdown files and executes figure scripts to produce a single self-contained `.md` file; ideal for AI agent ingestion
+- **Machine-readable output** — `--json [path]` writes a structured result object after any export; combine with `--no-build` to skip rebuilding when DOCX is already up-to-date
 
 ---
 
@@ -85,6 +88,21 @@ mdoc validate projects/my-thesis
 
 # Show all CLI options
 mdoc --help
+
+# Export all pages as PNG images (builds DOCX → PDF → images)
+mdoc export projects/my-thesis
+
+# Export specific pages at high DPI
+mdoc export images --pages 1,3-5 --dpi 200 projects/my-thesis
+
+# Flatten entire document to a single Markdown file for AI agents
+mdoc export md --out ./thesis_flat.md projects/my-thesis
+
+# Re-export images from an existing DOCX without rebuilding
+mdoc export images --no-build --pages 2- projects/my-thesis
+
+# Export help
+mdoc export --help
 ```
 
 ---
@@ -109,6 +127,12 @@ mdoc/
 │   ├── pdf.js             — DOCX → PDF conversion (LibreOffice / Word COM)
 │   ├── index.js           — Public programmatic API
 │   └── templates/         — Starter project templates (simple, report, thesis, manual)
+│
+├── src/
+│   └── exporter/          — Export sub-modules
+│       ├── images.js      — PDF → PNG/JPEG via pdftoppm / Ghostscript
+│       ├── markdown.js    — Flatten MD tree to single file
+│       └── pages.js       — Page range parser + executable finder
 │
 ├── bin/
 │   └── mdoc.js            — CLI executable entry point
@@ -325,10 +349,11 @@ u.saveAndPrint(canvas, OUT);
 
 ```
 mdoc [build] [options] <project-dir>
+mdoc export [format] [options] <project-dir>
 mdoc validate [--dep-graph] <project-dir|config-path>
 mdoc init [--template <name>] <new-dir>
 
-Options:
+Options (build):
   -h, --help              Show help and exit
       --version           Print version
   -v, --verbose           Per-step timings and debug output
@@ -340,17 +365,34 @@ Options:
       --soffice <path>    Path to soffice executable (auto-detected)
       --watch             Rebuild on file changes (debounced)
       --watch-debounce N  Debounce delay in ms (default: 300)
+      --var key=val       Override a project.config.js variable
+      --json [path]       Write build result as JSON
+
+Options (export):
+  -f, --format <name>     images | md  (repeatable; default: both)
+      --pages <spec>      Page range: 1,3-5 | 2- | -4 | all
+      --image-format      png | jpg (default: png)
+      --dpi <n>           Resolution in DPI (default: 150)
+      --prefix <name>     Image file name prefix
+      --no-build          Skip DOCX build, use existing output
+      --no-cover          Omit cover from flat Markdown
+      --pdftoppm <path>   Override pdftoppm binary
+      --gs <path>         Override Ghostscript binary
+      --json [path]       Write export result as JSON
 ```
 
 **Examples:**
 ```bash
-mdoc projects/my-report                    # DOCX + PDF
-mdoc -v --no-pdf projects/my-report        # DOCX only, verbose
-mdoc --pdf-only projects/my-report         # PDF from existing DOCX
+mdoc projects/my-report                          # DOCX + PDF
+mdoc -v --no-pdf projects/my-report              # DOCX only, verbose
+mdoc --pdf-only projects/my-report               # PDF from existing DOCX
 mdoc -o ./dist/output.docx projects/my-report
-mdoc --watch projects/my-thesis            # watch mode
-mdoc validate projects/my-report           # validate only, no build
-mdoc init --template thesis ./new-thesis   # scaffold from template
+mdoc --watch projects/my-thesis                  # watch mode
+mdoc validate projects/my-report                 # validate only, no build
+mdoc init --template thesis ./new-thesis         # scaffold from template
+mdoc export projects/my-thesis                   # images + flat MD
+mdoc export images --pages 1-3 --dpi 300 projects/my-thesis
+mdoc export md --out ./flat.md projects/my-thesis
 ```
 
 > **Note:** PDF generation requires [LibreOffice](https://www.libreoffice.org/) (`soffice` on PATH). On Windows, if Microsoft Word is installed, it is tried first.

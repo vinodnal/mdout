@@ -15,9 +15,10 @@ Write documents in Markdown, import images/scripts/other docs, compile to profes
 6. [Inline Syntax](#inline-syntax)
 7. [@import Directive](#import-directive-1)
 8. [Figure Scripts](#figure-scripts)
-9. [Programmatic API](#programmatic-api)
-10. [Troubleshooting](#troubleshooting)
-11. [Example Configurations](#example-configurations)
+9. [Export Command](#export-command)
+10. [Programmatic API](#programmatic-api)
+11. [Troubleshooting](#troubleshooting)
+12. [Example Configurations](#example-configurations)
 
 ---
 
@@ -55,6 +56,7 @@ Available templates: `simple` | `report` | `thesis` | `manual`
 
 ```
 mdoc [build] [options] <project-dir>     Build DOCX (and optionally PDF)
+mdoc export [format] [options] <dir>     Export to images or flat Markdown
 mdoc validate [options] <project-dir>    Validate imports and variables without building
 mdoc init [options] <new-dir>            Scaffold a new project from a template
 ```
@@ -83,6 +85,8 @@ mdoc [build] [options] <project-dir>
 | `--soffice <path>` | | Custom path to `soffice` executable | auto-detect |
 | `--watch` | | Rebuild on file changes | off |
 | `--watch-debounce <ms>` | | Debounce delay for watch mode | 300 ms |
+| `--var <key=value>` | | Override a `project.config.js` variable (repeatable) | — |
+| `--json [path]` | | Write build result as JSON to path (omit path → stdout) | — |
 
 **Examples:**
 
@@ -101,6 +105,12 @@ mdoc --pdf-only projects/my-thesis
 
 # Custom LibreOffice path (Windows)
 mdoc --soffice "C:\Program Files\LibreOffice\program\soffice.exe" -p projects/my-thesis
+
+# Override project variables
+mdoc --var year=2027 --var author="Jane Smith" projects/my-thesis
+
+# Write result JSON for pipeline use
+mdoc --json ./result.json projects/my-thesis
 ```
 
 ---
@@ -149,6 +159,118 @@ mdoc init [--template <name>] <new-dir>
 mdoc init ./my-doc                          # simple template (default)
 mdoc init --template report ./reports/q1
 mdoc init --template thesis ./thesis
+```
+
+---
+
+### `mdoc export`
+
+Export a built project to image files (one per PDF page) and/or a single flat Markdown file. Designed for AI agent document ingestion and automated pipelines.
+
+```bash
+mdoc export [format] [options] <project-dir>
+```
+
+**Formats** — one or more, space-separated or via `-f`:
+
+| Format | Alias | Description |
+|--------|-------|-------------|
+| `images` | `png` / `jpg` | Convert each PDF page to a PNG or JPEG file |
+| `md` | `markdown` | Flatten the entire Markdown tree to one file |
+
+If no format is given, both `images` and `md` are produced.
+
+**Shared options:**
+
+| Flag | Short | Description | Default |
+|------|-------|-------------|---------|
+| `--help` | `-h` | Show export help | — |
+| `--verbose` | `-v` | Verbose output | off |
+| `--quiet` | `-q` | Suppress output except errors | off |
+| `--format <name>` | `-f` | Explicit format (repeatable) | — |
+| `--out <path>` | `-o` | Output directory (images) or file (md) | auto |
+| `--no-build` | | Skip DOCX/PDF build, use existing output | off |
+| `--soffice <path>` | | Override LibreOffice soffice path | auto |
+| `--var <key=value>` | | Override a config variable (repeatable) | — |
+| `--json [path]` | | Write export result as JSON | — |
+
+**Images options:**
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--pages <spec>` | Pages to export: `1,3-5,7` \| `2-` \| `-4` \| `all` | all |
+| `--image-format <fmt>` | `png` or `jpg` | `png` |
+| `--dpi <n>` | Resolution in dots per inch | `150` |
+| `--prefix <name>` | Output file name prefix | project name |
+| `--pdftoppm <path>` | Override pdftoppm binary path | auto-detect |
+| `--gs <path>` | Override Ghostscript binary path | auto-detect |
+
+**Markdown options:**
+
+| Flag | Description |
+|------|-------------|
+| `--no-cover` | Omit `cover.md` from the flat output |
+
+**Page spec syntax:**
+
+| Spec | Meaning |
+|------|---------|
+| `all` | All pages (default) |
+| `1,3,5` | Pages 1, 3, 5 |
+| `2-5` | Pages 2 through 5 |
+| `3-` | Page 3 to end |
+| `-4` | Pages 1 through 4 |
+| `1,4-6,9` | Mixed: pages 1, 4, 5, 6, 9 |
+
+**Output locations** (defaults when `--out` is not set):
+- Images: `<project-dir>/export/images/`
+- Flat MD: `<project-dir>/<name>_flat.md`
+
+**PDF-to-image tools:** `pdftoppm` (from poppler-utils, preferred) is tried first. Ghostscript (`gswin64c` on Windows, `gs` on Unix) is used as fallback. Install poppler:
+- **Windows:** `winget install GnuWin32.Poppler` or via Chocolatey `choco install poppler`
+- **macOS:** `brew install poppler`
+- **Linux:** `sudo apt-get install poppler-utils`
+
+**Examples:**
+
+```bash
+# Export both images and flat MD (full build included)
+mdoc export projects/my-thesis
+
+# Images only, pages 1–5 at 200 DPI as JPEG
+mdoc export images --pages 1-5 --dpi 200 --image-format jpg projects/my-thesis
+
+# Export a specific single page
+mdoc export images --pages 7 projects/my-thesis
+
+# Flat Markdown without cover, custom output path
+mdoc export md --no-cover --out ./ai-input/thesis.md projects/my-thesis
+
+# Re-export images from existing build (no rebuild)
+mdoc export images --no-build --dpi 150 projects/my-thesis
+
+# Both formats, write JSON manifest for CI pipeline
+mdoc export --no-build --json ./export-result.json projects/my-thesis
+
+# Override a variable then export
+mdoc export md --var year=2027 projects/my-thesis
+```
+
+**JSON result structure** (when `--json` is used):
+
+```json
+{
+  "formats": ["images", "md"],
+  "images": [
+    { "page": 1, "path": "/abs/path/to/page-001.png" },
+    { "page": 2, "path": "/abs/path/to/page-002.png" }
+  ],
+  "markdown": {
+    "outputPath": "/abs/path/to/thesis_flat.md",
+    "byteLength": 142831
+  },
+  "elapsedMs": 3210
+}
 ```
 
 ---
@@ -1006,6 +1128,12 @@ u.saveAndPrint(canvas, OUT);
 
 ---
 
+## Export Command
+
+See [mdoc export](#mdoc-export) in the CLI Reference above.
+
+---
+
 ## Programmatic API
 
 ```js
@@ -1055,6 +1183,67 @@ const {
   makeNullLogger,   // () → silent logger
   CODES,            // warning/error code constants
 } = require('mdoc');
+```
+
+---
+
+### Exporter API
+
+The exporter sub-modules are available for direct programmatic use:
+
+```js
+const { exportPdfToImages } = require('mdoc/src/exporter/images');
+const { flattenToMarkdown } = require('mdoc/src/exporter/markdown');
+const { parsePageSpec, findExecutable } = require('mdoc/src/exporter/pages');
+```
+
+#### `exportPdfToImages(pdfPath, opts)` → `Promise<{ page, path }[]>`
+
+Convert a PDF to per-page image files.
+
+```js
+const pages = await exportPdfToImages('./thesis.pdf', {
+  outDir:   './out/images',
+  format:   'png',           // 'png' | 'jpg'
+  dpi:      150,
+  pageSpec: '1,3-5',         // null = all pages
+  prefix:   'slide',
+  pdftoppm: null,            // null = auto-detect
+  gs:       null,
+  logger:   null,
+});
+// → [{ page: 1, path: '/abs/out/images/slide-001.png' }, ...]
+```
+
+#### `flattenToMarkdown(configPath, opts)` → `Promise<{ outputPath, byteLength }>`
+
+Flatten a project's entire Markdown tree into a single file.
+
+```js
+const result = await flattenToMarkdown('./projects/my-thesis/project.config.js', {
+  out:     './thesis_flat.md',   // null = auto (<project>/<name>_flat.md)
+  noCover: false,
+  vars:    { year: '2027' },
+  logger:  null,
+});
+// → { outputPath: '/abs/path/thesis_flat.md', byteLength: 142831 }
+```
+
+The flat file resolves all `<!-- @import: ... -->` directives:
+- `.md` / `.txt` files are inlined recursively
+- Script files (`.js`, `.py`, `.ts`) are executed and their stdout is embedded
+- Images are converted to `![caption](relative-path)` references
+- `{{vars}}` are substituted using config vars merged with `opts.vars`
+
+#### `parsePageSpec(spec, totalPages)` → `number[]`
+
+Parse a page range string into a sorted array of 1-based page numbers.
+
+```js
+parsePageSpec('1,3-5,8', 10)  // → [1, 3, 4, 5, 8]
+parsePageSpec('2-',      5)   // → [2, 3, 4, 5]
+parsePageSpec('all',     3)   // → [1, 2, 3]
+parsePageSpec(null,      4)   // → [1, 2, 3, 4]
 ```
 
 ---
