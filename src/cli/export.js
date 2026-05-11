@@ -61,34 +61,37 @@ async function runExport(args) {
     elapsedMs: 0,
   };
 
-  // ── Dispatch by format ────────────────────────────────────────────────────
-
-  for (const fmt of opts.formats) {
-    switch (fmt) {
-      case "images": {
-        const images = await exportImages({ opts, log, configPath, target, isPdfInput, imageFormat: opts.imageFormat || "png" });
-        summary.formats.push("images");
-        summary.images = images;
-        break;
+  try {
+    // ── Dispatch by format ──────────────────────────────────────────────────
+    for (const fmt of opts.formats) {
+      switch (fmt) {
+        case "images": {
+          const images = await exportImages({ opts, log, configPath, target, isPdfInput, imageFormat: opts.imageFormat || "png" });
+          summary.formats.push("images");
+          summary.images = images;
+          break;
+        }
+        case "md":
+        case "markdown": {
+          const markdown = await exportMarkdown({ opts, log, configPath });
+          summary.formats.push("md");
+          summary.markdown = markdown;
+          break;
+        }
+        default:
+          die(`Unknown export format: "${fmt}". Supported: images, md`);
       }
-      case "md":
-      case "markdown": {
-        const markdown = await exportMarkdown({ opts, log, configPath });
-        summary.formats.push("md");
-        summary.markdown = markdown;
-        break;
-      }
-      default:
-        die(`Unknown export format: "${fmt}". Supported: images, md`);
     }
-  }
 
-  summary.elapsedMs = Math.round(performance.now() - startedAt);
+    summary.elapsedMs = Math.round(performance.now() - startedAt);
 
-  if (opts.jsonOutput) {
-    const jsonStr = JSON.stringify(summary, null, 2);
-    if (opts.jsonOutput === "-") process.stdout.write(jsonStr + "\n");
-    else fs.writeFileSync(path.resolve(opts.jsonOutput), jsonStr, "utf-8");
+    if (opts.jsonOutput) {
+      const jsonStr = JSON.stringify(summary, null, 2);
+      if (opts.jsonOutput === "-") process.stdout.write(jsonStr + "\n");
+      else fs.writeFileSync(path.resolve(opts.jsonOutput), jsonStr, "utf-8");
+    }
+  } finally {
+    log.summary();
   }
 }
 

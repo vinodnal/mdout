@@ -20,9 +20,7 @@
 const fs   = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
-
-const IMAGE_EXTS  = new Set([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"]);
-const SCRIPT_EXTS = new Set([".js", ".ts", ".py"]);
+const { IMAGE_EXTS, SCRIPT_EXTS, runtimeForScriptExt } = require("../import-types");
 
 // ─── Directive resolver ───────────────────────────────────────────────────────
 
@@ -101,9 +99,7 @@ function flattenFile(filePath, vars, visited, outDir, logger) {
         // Script -> execute and embed stdout
         if (SCRIPT_EXTS.has(ext)) {
           try {
-            const [interp, sArgs] = ext === ".py" ? ["python", [absImport]]
-                                  : ext === ".ts"  ? ["ts-node", [absImport]]
-                                  :                  ["node", [absImport]];
+            const [interp, sArgs] = [runtimeForScriptExt(ext), [absImport]];
             const stdout = execFileSync(interp, sArgs, {
               encoding: "utf-8",
               timeout: 30000,

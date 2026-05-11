@@ -137,7 +137,13 @@ async function runBuild(args) {
       .watch(projectDir, { ignoreInitial: true, ignored: /(node_modules|\.git)/ })
       .on("all", rebuild);
   } else {
-    await doBuild().catch(err => die(err.message));
+    try {
+      await doBuild();
+    } catch (err) {
+      die(err.message);
+    } finally {
+      log.summary();
+    }
   }
 }
 

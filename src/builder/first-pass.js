@@ -10,10 +10,9 @@
 const fs   = require("fs");
 const path = require("path");
 const { readTextFile } = require("./page");
+const { IMAGE_EXTS, SCRIPT_EXTS } = require("../import-types");
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"]);
 
 // ─── Heading modifier helpers ─────────────────────────────────────────────────
 
@@ -243,7 +242,7 @@ function collectElementEntries(entryPath) {
         const relPath    = importOpts._path || "";
         const abs        = relPath ? path.resolve(dir, relPath) : "";
         const ext        = abs ? path.extname(abs).toLowerCase() : "";
-        const isMedia    = IMAGE_EXTS.has(ext) || ext === ".js" || ext === ".py" || ext === ".ts";
+        const isMedia    = IMAGE_EXTS.has(ext) || SCRIPT_EXTS.has(ext);
 
         if (pending && isMedia) {
           entries.push({ kind: pending.kind, text: makeCaptionText(pending.kind, pending.title) });

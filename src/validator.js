@@ -22,9 +22,7 @@ const { execFileSync } = require("child_process");
 
 const { validateConfig } = require("./schema");
 const { CODES }          = require("./logger");
-
-const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"]);
-const SCRIPT_EXTS = new Set([".js", ".ts", ".py"]);
+const { IMAGE_EXTS, SCRIPT_EXTS, runtimeForScriptExt } = require("./import-types");
 const VAR_RE     = /\{\{(\w[\w.]*)\}\}/g;
 
 const commandExistsCache = new Map();
@@ -100,7 +98,7 @@ function crawl(filePath, availableVars, results, visitStack, visited) {
         } else if (ext === ".md" || ext === ".txt") {
           crawl(absImport, Object.fromEntries([...localVars].map(k => [k, ""])), results, visitStack, visited);
         } else if (SCRIPT_EXTS.has(ext)) {
-          const runtime = ext === ".py" ? "python" : ext === ".ts" ? "ts-node" : "node";
+          const runtime = runtimeForScriptExt(ext);
           if (!commandExists(runtime)) {
             results.warnings.push({
               code: "W001",

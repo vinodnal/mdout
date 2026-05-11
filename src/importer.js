@@ -22,8 +22,7 @@ const path         = require("path");
 const { execFileSync } = require("child_process");
 
 const { retrySync } = require("./utils");
-
-const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"]);
+const { IMAGE_EXTS, SCRIPT_EXTS, runtimeForScriptExt } = require("./import-types");
 
 function extractDocxTextSync(absPath) {
   const script = [
@@ -109,14 +108,10 @@ function createImporter(R, parseFn, opts = {}) {
 
     // ── Script (JS / TypeScript / Python) ───────────────────────────────────
 
-    if (ext === ".js" || ext === ".ts" || ext === ".py") {
+    if (SCRIPT_EXTS.has(ext)) {
       try {
         // Use execFileSync (no shell) to prevent shell-injection via crafted paths.
-        const [interpreter, scriptArgs] = ext === ".py"
-          ? ["python",  [absPath]]
-          : ext === ".ts"
-          ? ["ts-node", [absPath]]
-          : ["node",    [absPath]];
+        const [interpreter, scriptArgs] = [runtimeForScriptExt(ext), [absPath]];
         const stdout = execFileSync(interpreter, scriptArgs, {
           encoding: "utf-8",
           timeout:  30000,
