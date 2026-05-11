@@ -5,8 +5,7 @@
   "main": "src/index.js",
   "exports": {
     ".": "./src/index.js",
-    "./canvas-utils": "./src/canvas-utils.js",
-    "./core/canvas-utils": "./core/canvas-utils.js"
+    "./canvas-utils": "./src/canvas-utils.js"
   },
   "bin": {
     "mdoc": "./bin/mdoc.js"
@@ -14,7 +13,6 @@
   "files": [
     "src/",
     "bin/",
-    "core/",
     "build.js",
     "README.md",
     "USAGE.md"

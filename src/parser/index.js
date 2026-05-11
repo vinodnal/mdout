@@ -299,7 +299,7 @@ function parseMD(text, dir, R, importFn, opts = {}) {
       const alignMod  = modifiers.has("center")  ? ALIGN_MAP.center
                       : modifiers.has("right")    ? ALIGN_MAP.right
                       : modifiers.has("left")     ? ALIGN_MAP.left
-                      : (alignStack.length ? alignStack[alignStack.length - 1] : undefined);
+                      : currentAlignment();
 
       if (!nonumber && hMatch[1].length === 1) state.chapterIndex += 1;
 

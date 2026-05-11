@@ -1038,7 +1038,7 @@ The script is executed; its stdout determines what is imported:
 **Example script:**
 
 ```js
-const u = require('mdoc/core/canvas-utils');
+const u = require('mdoc/canvas-utils');
 const path = require('path');
 
 const OUT = path.join(__dirname, '_pareto.png');
@@ -1073,7 +1073,7 @@ u.saveAndPrint(canvas, OUT);   // prints the path to stdout
 Use `core/canvas-utils.js` to generate figures programmatically from `.js` scripts.
 
 ```js
-const u = require('mdoc/core/canvas-utils');
+const u = require('mdoc/canvas-utils');
 ```
 
 ### API Reference
@@ -1097,7 +1097,7 @@ const u = require('mdoc/core/canvas-utils');
 ### Example: Bar Chart
 
 ```js
-const u = require('mdoc/core/canvas-utils');
+const u = require('mdoc/canvas-utils');
 const path = require('path');
 
 const OUT = path.join(__dirname, '_chart.png');
