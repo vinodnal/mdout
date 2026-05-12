@@ -21,6 +21,10 @@ const { createTableRenderer }         = require("./renderer/table");
 const { createElementsRenderer }      = require("./renderer/elements");
 const { createStylesRenderer }        = require("./renderer/styles");
 
+function isRtlLanguage(language) {
+  return /^ar(?:-|$)/i.test(String(language || ""));
+}
+
 // ─── Factory ──────────────────────────────────────────────────────────────────
 
 /**
@@ -38,6 +42,7 @@ function createRenderer(theme = {}, pageConfig = {}, vars = {}, logger = null) {
   const fsMap      = theme.fontSize  || {};
   const spacingCfg = theme.spacing   || {};
   const headingSp  = spacingCfg.headings || {};
+  const rtl        = Boolean(pageConfig.rtl || isRtlLanguage(pageConfig.language || theme.language || ""));
 
   // ── Resolved palette & sizes ───────────────────────────────────────────────
   const C         = buildColors(colors);
@@ -83,7 +88,7 @@ function createRenderer(theme = {}, pageConfig = {}, vars = {}, logger = null) {
   const ctx = {
     C, FONT, CODE_FONT, MATH_FONT,
     FS, H1_FS, H2_FS, H3_FS, H4_FS, CAP_FS, CODE_FS,
-    SP, CONTENT_W, fsMap, applyVars, logger,
+    SP, CONTENT_W, fsMap, applyVars, logger, rtl,
   };
 
   // ── Wire sub-renderers ─────────────────────────────────────────────────────
@@ -105,6 +110,7 @@ function createRenderer(theme = {}, pageConfig = {}, vars = {}, logger = null) {
     makeNumbering:   styles.makeNumbering,
     // Shared utilities
     applyVars,
+    rtl,
     // Exposed for builder
     FONT,
     COLOR: C,

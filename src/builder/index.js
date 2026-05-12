@@ -61,7 +61,10 @@ async function buildFromConfig(rawConfig, opts = {}) {
   const globalPageConf = computePageConfig(cfg.page);
   const globalVars     = Object.assign({}, cfg.vars || {});
 
-  const R = createRenderer(cfg.theme, { contentWidth: globalPageConf.contentWidth }, globalVars, log);
+  const R = createRenderer(cfg.theme, {
+    contentWidth: globalPageConf.contentWidth,
+    language: cfg.meta?.language,
+  }, globalVars, log);
 
   let tocEntries     = [];
   let elementEntries = [];
