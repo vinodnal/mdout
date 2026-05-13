@@ -9,7 +9,7 @@
 const fs   = require("fs");
 const path = require("path");
 const {
-  Document, Packer, Paragraph, TextRun, AlignmentType, SectionType, NumberFormat,
+  Document, Packer, Paragraph, TextRun, AlignmentType, SectionType, NumberFormat, OnOffElement,
 } = require("docx");
 
 const { validateConfig }    = require("../schema");
@@ -231,6 +231,9 @@ async function buildFromConfig(rawConfig, opts = {}) {
     numbering:   R.makeNumbering(),
     sections:    docSections,
   });
+
+  // Ask Word to keep original embedded image quality.
+  doc.Settings.addChildElement(new OnOffElement("w:doNotCompressPictures", true));
 
   // ── Write output ──────────────────────────────────────────────────────────
   const outputPath = path.resolve(projectDir, cfg.output);

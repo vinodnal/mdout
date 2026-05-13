@@ -55,9 +55,10 @@ function buildWordPdfScript(docxPath, pdfPath) {
     "  try { $doc.Fields.Update() | Out-Null } catch {}",
     "  try { $doc.UpdateSummaryProperties() | Out-Null } catch {}",
     "  try {",
-    "    [object] $null = $doc.ExportAsFixedFormat('${pdf}', 17, $false, 1, 0, -1, -1, 0, $true, $false, 1, $false, $false)",
+    // OptimizeFor = 0 => print quality (higher fidelity than on-screen mode).
+    `    [object] $null = $doc.ExportAsFixedFormat('${pdf}', 17, $false, 0, 0, -1, -1, 0, $true, $false, 1, $false, $false)`,
     "  } catch {",
-    "    $doc.SaveAs([ref]'${pdf}', [ref]17)",
+    `    $doc.SaveAs([ref]'${pdf}', [ref]17)`,
     "  }",
     "} finally {",
     "  if ($doc  -ne $null) { try { $doc.Close([ref]$false) } catch {} }",
@@ -82,7 +83,8 @@ function convertToPdfWithWord(docxPath, opts = {}) {
   if (!fs.existsSync(pdfPath)) {
     throw new Error(`Word conversion completed but PDF not found at: ${pdfPath}`);
   }
-  log.debug("PDF conversion engine: Microsoft Word COM");
+  if (opts.engineRef) opts.engineRef.used = "word";
+  log.info("PDF conversion engine: Microsoft Word COM");
   return pdfPath;
 }
 
@@ -95,6 +97,8 @@ function convertToPdfWithWord(docxPath, opts = {}) {
  * @param {string} [opts.sofficePath] Override path to soffice.
  * @param {number} [opts.timeout]    Timeout in ms (default: 90000).
  * @param {boolean} [opts.disableWordCom] Force skipping Word COM and use LibreOffice directly.
+ * @param {("auto"|"word"|"libreoffice")} [opts.pdfEngine] Engine selection strategy.
+ * @param {object} [opts.engineRef]   Optional mutable object; receives { used: "word"|"libreoffice" }.
  * @param {object} [opts.logger]     Logger with { info, warn, error, debug } methods.
  * @returns {string}  Absolute path to the generated .pdf file.
  */
@@ -102,17 +106,34 @@ function convertToPdf(docxPath, opts = {}) {
   const log    = opts.logger || { info: () => {}, warn: console.warn, error: console.error, debug: () => {} };
   const outDir = opts.outDir || path.dirname(fs.realpathSync(docxPath));
   const timeo  = opts.timeout || 90_000;
+  const requestedEngine = String(opts.pdfEngine || "auto").toLowerCase();
+
+  if (requestedEngine !== "auto" && requestedEngine !== "word" && requestedEngine !== "libreoffice") {
+    throw new Error(`Invalid pdfEngine option: "${requestedEngine}". Use auto, word, or libreoffice.`);
+  }
+
+  if (requestedEngine === "word" && process.platform !== "win32") {
+    throw new Error("PDF engine 'word' is only available on Windows.");
+  }
+
+  const allowWord = process.platform === "win32" && !opts.disableWordCom;
+  const shouldTryWord = allowWord && (requestedEngine === "auto" || requestedEngine === "word");
 
   // On Windows, try headless Word conversion first for better field resolution
   // (e.g., SECTIONPAGES), then fall back to LibreOffice.
-  if (process.platform === "win32" && !opts.disableWordCom) {
+  if (shouldTryWord) {
     try {
-      return convertToPdfWithWord(docxPath, { outDir, timeout: timeo, logger: log });
+      return convertToPdfWithWord(docxPath, { outDir, timeout: timeo, logger: log, engineRef: opts.engineRef });
     } catch (err) {
+      if (requestedEngine === "word") {
+        throw new Error(`Word PDF conversion failed: ${err.message}`);
+      }
       log.debug(`Word conversion unavailable, falling back to LibreOffice: ${err.message}`);
     }
-  } else if (process.platform === "win32" && opts.disableWordCom) {
+  } else if (process.platform === "win32" && opts.disableWordCom && requestedEngine === "auto") {
     log.debug("Word COM disabled for this conversion; using LibreOffice");
+  } else if (process.platform === "win32" && requestedEngine === "libreoffice") {
+    log.debug("PDF engine forced to LibreOffice");
   }
 
   const soffice = findSoffice(opts.sofficePath);
@@ -137,7 +158,8 @@ function convertToPdf(docxPath, opts = {}) {
   if (!fs.existsSync(pdfPath)) {
     throw new Error(`LibreOffice ran successfully but PDF not found at: ${pdfPath}`);
   }
-  log.debug("PDF conversion engine: LibreOffice");
+  if (opts.engineRef) opts.engineRef.used = "libreoffice";
+  log.info("PDF conversion engine: LibreOffice");
   return pdfPath;
 }
 

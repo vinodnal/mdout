@@ -6,6 +6,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- Word PDF export now uses print-optimized rendering (`ExportAsFixedFormat` OptimizeFor=Print) to improve chart/image clarity.
+- Generated DOCX now sets `w:doNotCompressPictures` via native docx settings, reducing automatic image downsampling in Word.
+
 ## [1.0.0] — Initial release
 
 ### Added
