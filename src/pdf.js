@@ -53,7 +53,12 @@ function buildWordPdfScript(docxPath, pdfPath) {
     "    try { $story.Fields.Update() | Out-Null } catch {}",
     "  }",
     "  try { $doc.Fields.Update() | Out-Null } catch {}",
-    `  $doc.SaveAs([ref]'${pdf}', [ref]17)`,
+    "  try { $doc.UpdateSummaryProperties() | Out-Null } catch {}",
+    "  try {",
+    "    [object] $null = $doc.ExportAsFixedFormat('${pdf}', 17, $false, 1, 0, -1, -1, 0, $true, $false, 1, $false, $false)",
+    "  } catch {",
+    "    $doc.SaveAs([ref]'${pdf}', [ref]17)",
+    "  }",
     "} finally {",
     "  if ($doc  -ne $null) { try { $doc.Close([ref]$false) } catch {} }",
     "  if ($word -ne $null) { try { $word.Quit() } catch {} }",
@@ -129,6 +134,7 @@ function convertToPdf(docxPath, opts = {}) {
   if (!fs.existsSync(pdfPath)) {
     throw new Error(`LibreOffice ran successfully but PDF not found at: ${pdfPath}`);
   }
+  log.debug("PDF conversion engine: LibreOffice");
   return pdfPath;
 }
 

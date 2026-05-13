@@ -125,7 +125,9 @@ async function exportImages({ opts, log, configPath, target, isPdfInput, imageFo
         die("--no-build requires an existing DOCX output. Run without --no-build first.");
       }
       log.info(`\n${C.bold}${C.blue}▶ Converting existing DOCX to PDF…${C.reset}`);
+      const tpdf = performance.now();
       pdfPath = await convertToPdf(existingDocx, { sofficePath: opts.soffice, logger: log });
+      log.debug(`  PDF conversion took ${(performance.now() - tpdf).toFixed(0)} ms`);
     } else {
       log.info(`\n${C.bold}${C.blue}▶ Building ${rawConfig.name || path.basename(rawConfig._dir)}…${C.reset}`);
       const t0     = performance.now();
@@ -133,7 +135,9 @@ async function exportImages({ opts, log, configPath, target, isPdfInput, imageFo
       log.step(`DOCX built in ${(performance.now() - t0).toFixed(0)} ms`);
 
       log.step("Converting to PDF…");
+      const tpdf = performance.now();
       pdfPath = await convertToPdf(result.outputPath, { sofficePath: opts.soffice, logger: log });
+      log.debug(`  PDF conversion took ${(performance.now() - tpdf).toFixed(0)} ms`);
     }
   }
 
@@ -148,6 +152,8 @@ async function exportImages({ opts, log, configPath, target, isPdfInput, imageFo
   log.info(`${C.bold}${C.blue}▶ Exporting pages as ${imageFormat.toUpperCase()}…${C.reset}`);
 
   const t1 = performance.now();
+  log.debug(`  PDF path: ${pdfPath}`);
+  log.debug(`  Output dir: ${outDir}`);
   const pages = await exportPdfToImages(pdfPath, {
     outDir,
     prefix,
@@ -174,6 +180,7 @@ async function exportMarkdown({ opts, log, configPath }) {
   log.info(`\n${C.bold}${C.blue}▶ Flattening project to Markdown…${C.reset}`);
 
   const t0     = performance.now();
+  log.step("Processing markdown exports…");
   const result = await flattenToMarkdown(configPath, {
     out:          opts.out  ? path.resolve(opts.out) : undefined,
     includeCover: !opts.noCover,

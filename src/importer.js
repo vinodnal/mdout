@@ -83,7 +83,10 @@ function createImporter(R, parseFn, opts = {}) {
 
     if (IMAGE_EXTS.has(ext)) {
       if (!fs.existsSync(absPath)) {
-        if (logger) logger.warn(`Image not found: ${absPath}`, "W001", { file: relPath });
+        if (logger) {
+          logger.warn(`Image not found: ${absPath}`, "W001", { file: relPath });
+          logger.debug(`  Import resolved from: ${dir}`);
+        }
         else console.warn(`[importer] Image not found: ${absPath}`);
         return [];
       }
@@ -98,7 +101,10 @@ function createImporter(R, parseFn, opts = {}) {
 
     if (ext === ".md" || ext === ".txt") {
       if (!fs.existsSync(absPath)) {
-        if (logger) logger.warn(`Markdown file not found: ${absPath}`, "W001", { file: relPath });
+        if (logger) {
+          logger.warn(`Markdown file not found: ${absPath}`, "W001", { file: relPath });
+          logger.debug(`  File source: ${dir}`);
+        }
         else console.warn(`[importer] File not found: ${absPath}`);
         return [];
       }

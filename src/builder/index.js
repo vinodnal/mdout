@@ -87,12 +87,18 @@ async function buildFromConfig(rawConfig, opts = {}) {
 
   // ── First pass: collect ToC and element lists ─────────────────────────────
   const inputPath = path.resolve(projectDir, cfg.input);
+  const t1pass = performance.now();
+  log.step("Scanning document structure…");
   tocEntries      = collectTocEntries(inputPath);
   elementEntries  = collectElementEntries(inputPath);
+  log.debug(`  ToC entries: ${tocEntries.length}, Element entries: ${elementEntries.length}`);
 
   // ── Parse body ────────────────────────────────────────────────────────────
+  const tparse = performance.now();
+  log.step("Parsing markdown…");
   const mdText      = readTextFile(inputPath);
   const allElements = parseFn(mdText, path.dirname(inputPath));
+  log.debug(`  Generated ${allElements.length} block elements`);
 
   // ── Split into sections at SECTION_BREAK markers ──────────────────────────
   const segments = splitAtSectionBreaks(allElements);
