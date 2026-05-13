@@ -37,6 +37,10 @@ function createStylesRenderer({ C, FONT, CODE_FONT, FS, H1_FS, H2_FS, H3_FS, H4_
     return rtl ? AlignmentType.RIGHT : undefined;
   }
 
+  function mirroredIndent(left, hanging) {
+    return rtl ? { right: left, hanging } : { left, hanging };
+  }
+
   function makeStyles() {
     return {
       default: { document: { run: { font: FONT, size: FS, color: C.BODY } } },
@@ -168,32 +172,32 @@ function createStylesRenderer({ C, FONT, CODE_FONT, FS, H1_FS, H2_FS, H3_FS, H4_
         {
           reference: "headings",
           levels: [
-            { level: 0, format: LevelFormat.UPPER_ROMAN, text: "%1.", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
-              style: { paragraph: { indent: { left: 0, hanging: 0 } } } },
-            { level: 1, format: LevelFormat.DECIMAL, text: "%2.", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
-              style: { paragraph: { indent: { left: 0, hanging: 0 } } } },
-            { level: 2, format: LevelFormat.DECIMAL, text: "%2.%3.", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
-              style: { paragraph: { indent: { left: 0, hanging: 0 } } } },
-            { level: 3, format: LevelFormat.DECIMAL, text: "%2.%3.%4.", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
-              style: { paragraph: { indent: { left: 0, hanging: 0 } } } },
+            { level: 0, format: LevelFormat.UPPER_ROMAN, text: "%1.\u00A0", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
+              style: { paragraph: { indent: mirroredIndent(0, 0) } } },
+            { level: 1, format: LevelFormat.DECIMAL, text: "%2.\u00A0", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
+              style: { paragraph: { indent: mirroredIndent(0, 0) } } },
+            { level: 2, format: LevelFormat.DECIMAL, text: "%2.%3.\u00A0", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
+              style: { paragraph: { indent: mirroredIndent(0, 0) } } },
+            { level: 3, format: LevelFormat.DECIMAL, text: "%2.%3.%4.\u00A0", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
+              style: { paragraph: { indent: mirroredIndent(0, 0) } } },
           ],
         },
         {
           reference: "bullets",
           levels: [
             { level: 0, format: LevelFormat.BULLET, text: "\u2022", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
-              style: { paragraph: { indent: { left: 720,  hanging: 360 } } } },
+              style: { paragraph: { indent: mirroredIndent(720, 360) } } },
             { level: 1, format: LevelFormat.BULLET, text: "\u25E6", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
-              style: { paragraph: { indent: { left: 1080, hanging: 360 } } } },
+              style: { paragraph: { indent: mirroredIndent(1080, 360) } } },
             { level: 2, format: LevelFormat.BULLET, text: "\u25AA", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
-              style: { paragraph: { indent: { left: 1440, hanging: 360 } } } },
+              style: { paragraph: { indent: mirroredIndent(1440, 360) } } },
           ],
         },
         {
           reference: "numbers",
           levels: [
             { level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: rtl ? AlignmentType.RIGHT : AlignmentType.LEFT,
-              style: { paragraph: { indent: { left: 720, hanging: 360 } } } },
+              style: { paragraph: { indent: mirroredIndent(720, 360) } } },
           ],
         },
       ],

@@ -23,6 +23,10 @@ function hasArabic(text) {
   return ARABIC_RE.test(String(text || ""));
 }
 
+function makeMarkerRun(text) {
+  return new TextRun({ text, rightToLeft: true });
+}
+
 // ─── Caption labels ───────────────────────────────────────────────────────────
 
 const CAPTION_LABELS = {
@@ -117,9 +121,6 @@ function createElementsRenderer({
       alignment: isArabic ? AlignmentType.RIGHT : opts.alignment,
       children:  parseInlineRuns(captionText),
     };
-    if (isArabic) {
-      para.bidi = true;
-    }
     return new Paragraph(para);
   }
 
@@ -134,9 +135,6 @@ function createElementsRenderer({
       alignment: isArabic ? AlignmentType.RIGHT : opts.alignment,
       indent:    opts.indent,
     };
-    if (isArabic) {
-      para.bidi = true;
-    }
     return new Paragraph(para);
   }
 
@@ -155,9 +153,6 @@ function createElementsRenderer({
       alignment: opts.alignment ?? (isArabic ? AlignmentType.RIGHT : (opts.nonumber ? AlignmentType.CENTER : undefined)),
       children:  [new TextRun(clean)],
     };
-    if (isArabic) {
-      para.bidi = true;
-    }
     if (!opts.nonumber) {
       para.heading   = lvlMap[clampedLevel] || HeadingLevel.HEADING_1;
       para.numbering = { reference: "headings", level: Math.max(0, Math.min(3, (level || 1) - 1)) };
@@ -177,9 +172,6 @@ function createElementsRenderer({
       alignment: isArabic ? AlignmentType.RIGHT : opts.alignment,
       children:  parseInlineRuns(captionText),
     };
-    if (isArabic) {
-      para.bidi = true;
-    }
     return new Paragraph(para);
   }
 
@@ -191,9 +183,6 @@ function createElementsRenderer({
       alignment: isArabic ? AlignmentType.RIGHT : opts.alignment,
       children:  parseInlineRuns(clean),
     };
-    if (isArabic) {
-      para.bidi = true;
-    }
     return new Paragraph(para);
   }
 
@@ -229,18 +218,38 @@ function createElementsRenderer({
   }
 
   function makeBullet(text, level = 0) {
+    const isArabic = hasArabic(text);
+    const bodyText = text.replace(/^[-*]\s+/, "");
+    if (isArabic) {
+      return new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        children: [makeMarkerRun("\u200F•\u00A0"), ...parseInlineRuns(bodyText)],
+        spacing: { line: SP.paragraphLine, after: SP.bulletAfter },
+      });
+    }
     return new Paragraph({
       numbering: { reference: "bullets", level },
-      children:  parseInlineRuns(text.replace(/^[-*]\s+/, "")),
+      children:  parseInlineRuns(bodyText),
       spacing:   { line: SP.paragraphLine, after: SP.bulletAfter },
+      alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT,
     });
   }
 
-  function makeNumbered(text) {
+  function makeNumbered(text, index = 1) {
+    const isArabic = hasArabic(text);
+    const bodyText = text.replace(/^\d+\.\s+/, "");
+    if (isArabic) {
+      return new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        children: [makeMarkerRun(`\u200F${index}.\u00A0`), ...parseInlineRuns(bodyText)],
+        spacing: { line: SP.paragraphLine, after: SP.bulletAfter },
+      });
+    }
     return new Paragraph({
       numbering: { reference: "numbers", level: 0 },
-      children:  parseInlineRuns(text.replace(/^\d+\.\s+/, "")),
+      children:  parseInlineRuns(bodyText),
       spacing:   { line: SP.paragraphLine, after: SP.bulletAfter },
+      alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT,
     });
   }
 
@@ -348,7 +357,11 @@ function createElementsRenderer({
 
   function makeImage(data, ext, opts = {}) {
     const dims = readImageDimensions(data);
-    const maxPx  = opts.width ? Math.max(1, parseInt(opts.width) || 1) : Math.round(CONTENT_W / 15);
+    const contentPx = Math.max(1, Math.floor((CONTENT_W - 120) / 15));
+    const requestedWidth = Number.parseInt(opts.width, 10);
+    const maxPx = Number.isFinite(requestedWidth) && requestedWidth > 0
+      ? requestedWidth
+      : Math.min(contentPx, dims.width || contentPx);
     const safeW  = dims.width  || 480;
     const safeH  = dims.height || 320;
     const scale  = maxPx / safeW;
@@ -362,6 +375,7 @@ function createElementsRenderer({
     const elems = [new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing:   { before: 160, after: opts.caption ? 60 : 200 },
+      indent:    { left: 0, right: 0, firstLine: 0, hanging: 0 },
       children:  [new ImageRun({
         data,
         transformation: { width: Math.round(safeW * scale), height: Math.round(safeH * scale) },

@@ -367,7 +367,8 @@ function parseMD(text, dir, R, importFn, opts = {}) {
     // ════════════════════════════════════════════════════════════════════════
 
     if (/^\d+\.\s+/.test(trimmed)) {
-      push(R.makeNumbered(trimmed));
+      const itemNumber = String(Number(trimmed.match(/^(\d+)\./)[1]));
+      push(R.makeNumbered(trimmed, itemNumber));
       i++; continue;
     }
 

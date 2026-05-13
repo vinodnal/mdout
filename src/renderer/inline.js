@@ -143,7 +143,7 @@ function createInlineRenderer({ C, FONT, CODE_FONT, MATH_FONT, FS, CODE_FS, fsMa
   function makeRun(text, overrides = {}) {
     const isArabic = hasArabic(text);
     const baseRun = { text, font: FONT, size: FS, color: C.BODY, ...overrides };
-    if (isArabic) baseRun.rtl = true;
+    if (isArabic) baseRun.rightToLeft = true;
     return new TextRun(baseRun);
   }
 
@@ -207,7 +207,7 @@ function createInlineRenderer({ C, FONT, CODE_FONT, MATH_FONT, FS, CODE_FS, fsMa
     pushStyledRuns(source.slice(segmentStart), runs);
     return runs.length
       ? runs
-      : [new TextRun({ text: source, font: FONT, size: FS, color: C.BODY, ...(hasArabic(source) ? { rtl: true } : {}) })];
+      : [new TextRun({ text: source, font: FONT, size: FS, color: C.BODY, ...(hasArabic(source) ? { rightToLeft: true } : {}) })];
   }
 
   return { parseInlineRuns, pushStyledRuns, makeRun, resolveColor };
