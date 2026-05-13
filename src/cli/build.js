@@ -110,7 +110,11 @@ async function runBuild(args) {
       log.blank();
       log.step("Converting to PDF (LibreOffice)...");
       const tp = performance.now();
-      const pdfResult = await convertToPdf(result.outputPath, { sofficePath: opts.soffice, logger: log });
+      const pdfResult = await convertToPdf(result.outputPath, {
+        sofficePath: opts.soffice,
+        logger: log,
+        disableWordCom: opts.watch,
+      });
       log.step(`PDF  → ${pdfResult}`, performance.now() - tp);
     }
   }

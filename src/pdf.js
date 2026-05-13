@@ -94,6 +94,7 @@ function convertToPdfWithWord(docxPath, opts = {}) {
  * @param {string} [opts.outDir]     Output directory (default: same dir as docxPath).
  * @param {string} [opts.sofficePath] Override path to soffice.
  * @param {number} [opts.timeout]    Timeout in ms (default: 90000).
+ * @param {boolean} [opts.disableWordCom] Force skipping Word COM and use LibreOffice directly.
  * @param {object} [opts.logger]     Logger with { info, warn, error, debug } methods.
  * @returns {string}  Absolute path to the generated .pdf file.
  */
@@ -104,12 +105,14 @@ function convertToPdf(docxPath, opts = {}) {
 
   // On Windows, try headless Word conversion first for better field resolution
   // (e.g., SECTIONPAGES), then fall back to LibreOffice.
-  if (process.platform === "win32") {
+  if (process.platform === "win32" && !opts.disableWordCom) {
     try {
       return convertToPdfWithWord(docxPath, { outDir, timeout: timeo, logger: log });
     } catch (err) {
       log.debug(`Word conversion unavailable, falling back to LibreOffice: ${err.message}`);
     }
+  } else if (process.platform === "win32" && opts.disableWordCom) {
+    log.debug("Word COM disabled for this conversion; using LibreOffice");
   }
 
   const soffice = findSoffice(opts.sofficePath);
