@@ -41,6 +41,7 @@ const { parsePageSpec, findExecutable } = require("./exporter/pages");
  * @param {string}  [opts.logLevel]   "info" | "warn" | "error" | "silent". Default "info".
  * @param {boolean} [opts.pdf]        Also convert to PDF via LibreOffice after build.
  * @param {string}  [opts.sofficePath] Override soffice binary path for PDF conversion.
+ * @param {("auto"|"word"|"libreoffice")} [opts.pdfEngine] Force PDF engine selection.
  * @returns {Promise<object>} Build result: { outputPath, byteLength, sectionCount, ... }
  */
 async function build(configPath, opts = {}) {
@@ -65,6 +66,7 @@ async function build(configPath, opts = {}) {
     await convertToPdf(result.outputPath, {
       outDir:      path.dirname(result.outputPath),
       sofficePath: opts.sofficePath,
+      pdfEngine:   opts.pdfEngine,
       logger:      log,
     });
   }

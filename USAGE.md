@@ -84,6 +84,7 @@ mdoc [build] [options] <project-dir>
 | `--no-pdf` | | Skip PDF generation | — |
 | `--out <path>` | `-o` | Override output path from config | uses config |
 | `--soffice <path>` | | Custom path to `soffice` executable | auto-detect |
+| `--pdf-engine <name>` | | PDF engine: `auto` \| `word` \| `libreoffice` | `auto` |
 | `--watch` | | Rebuild on file changes | off |
 | `--watch-debounce <ms>` | | Debounce delay for watch mode | 300 ms |
 | `--var <key=value>` | | Override a `project.config.js` variable (repeatable) | — |
@@ -106,6 +107,12 @@ mdoc --pdf-only projects/my-thesis
 
 # Custom LibreOffice path (Windows)
 mdoc --soffice "C:\Program Files\LibreOffice\program\soffice.exe" -p projects/my-thesis
+
+# Force Word engine (Windows only)
+mdoc --pdf-engine word -p projects/my-thesis
+
+# Force LibreOffice engine
+mdoc --pdf-engine libreoffice -p projects/my-thesis
 
 # Override project variables
 mdoc --var year=2027 --var author="Jane Smith" projects/my-thesis
@@ -194,6 +201,7 @@ When exporting both formats in one command, avoid `--out` because images expect 
 | `--out <path>` | `-o` | Output directory (images) or file (md) | auto |
 | `--no-build` | | Skip DOCX/PDF build, use existing output | off |
 | `--soffice <path>` | | Override LibreOffice soffice path | auto |
+| `--pdf-engine <name>` | | PDF engine: `auto` \| `word` \| `libreoffice` | `auto` |
 | `--var <key=value>` | | Override a config variable (repeatable) | — |
 | `--json [path]` | | Write export result as JSON | — |
 

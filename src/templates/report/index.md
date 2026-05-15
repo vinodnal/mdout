@@ -1,4 +1,4 @@
-# Report Title {.no-num}
+# Report Title {.no-num .center}
 
 <!-- @toc -->
 

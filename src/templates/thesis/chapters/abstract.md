@@ -1,4 +1,4 @@
-# Abstract {.no-num}
+# Abstract {.no-num .center}
 
 Provide a concise summary of the thesis (200–400 words).
 

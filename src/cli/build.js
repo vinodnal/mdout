@@ -68,9 +68,14 @@ async function runBuild(args) {
       const { convertToPdf } = require("../pdf");
       log.info(`\n${C.bold}${C.blue}▶ ${rawConfig.name || path.basename(projectDir)}${C.reset}`);
       log.blank();
-      log.step("Converting existing DOCX to PDF (LibreOffice)...");
+      log.step("Converting existing DOCX to PDF...");
       const tp = performance.now();
-      const pdfResult = await convertToPdf(existingDocx, { sofficePath: opts.soffice, logger: log });
+      const pdfResult = await convertToPdf(existingDocx, {
+        sofficePath: opts.soffice,
+        logger: log,
+        pdfEngine: opts.pdfEngine,
+        disableWordCom: opts.watch && opts.pdfEngine !== "word",
+      });
       log.step(`PDF  → ${pdfResult}`, performance.now() - tp);
       return;
     }
@@ -108,12 +113,13 @@ async function runBuild(args) {
     if (opts.pdf) {
       const { convertToPdf } = require("../pdf");
       log.blank();
-      log.step("Converting to PDF (LibreOffice)...");
+      log.step("Converting to PDF...");
       const tp = performance.now();
       const pdfResult = await convertToPdf(result.outputPath, {
         sofficePath: opts.soffice,
         logger: log,
-        disableWordCom: opts.watch,
+        pdfEngine: opts.pdfEngine,
+        disableWordCom: opts.watch && opts.pdfEngine !== "word",
       });
       log.step(`PDF  → ${pdfResult}`, performance.now() - tp);
     }

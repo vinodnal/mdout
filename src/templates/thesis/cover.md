@@ -1,10 +1,10 @@
-# {{university}} {.no-num}
+# {{university}} {.no-num .center}
 
-## {{department}} {.no-num}
+## {{department}} {.no-num .center}
 
 ---
 
-### {{name}} {.no-num}
+### {{name}} {.no-num .center}
 
 **Presented by:** {{candidate}}
 

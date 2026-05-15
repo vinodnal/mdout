@@ -1,4 +1,4 @@
-# {{product}} User Manual {.no-num}
+# {{product}} User Manual {.no-num .center}
 
 Version {{version}} — {{year}}
 

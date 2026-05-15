@@ -46,6 +46,15 @@ function addExportFormatToken(opts, tokenRaw, sourceFlag) {
   }
 }
 
+function parsePdfEngineFlag(valueRaw, flagName = "--pdf-engine") {
+  const value = String(valueRaw || "").toLowerCase();
+  if (!value) die(`${flagName} requires a value (auto|word|libreoffice).`);
+  if (value !== "auto" && value !== "word" && value !== "libreoffice") {
+    die(`${flagName} must be one of: auto, word, libreoffice.`);
+  }
+  return value;
+}
+
 // ─── Build ────────────────────────────────────────────────────────────────────
 
 /**
@@ -66,6 +75,7 @@ function parseBuildArgs(args) {
     pdfOnly:       false,
     out:           null,
     soffice:       null,
+    pdfEngine:     "auto",
     projectDir:    null,
     watch:         false,
     watchDebounce: 300,
@@ -100,6 +110,11 @@ function parseBuildArgs(args) {
       case "--soffice": {
         opts.soffice = args[++i];
         if (!opts.soffice) die("--soffice requires a path argument.");
+        break;
+      }
+
+      case "--pdf-engine": {
+        opts.pdfEngine = parsePdfEngineFlag(args[++i]);
         break;
       }
 
@@ -194,6 +209,7 @@ function parseExportArgs(args) {
     pdftoppm:    null,
     gs:          null,
     soffice:     null,
+    pdfEngine:   "auto",
     skipBuild:   false,       // --no-build: skip DOCX build, use existing output
     // md options
     noCover:     false,
@@ -255,6 +271,11 @@ function parseExportArgs(args) {
       case "--soffice": {
         opts.soffice = args[++i];
         if (!opts.soffice) die("--soffice requires a path.");
+        break;
+      }
+
+      case "--pdf-engine": {
+        opts.pdfEngine = parsePdfEngineFlag(args[++i]);
         break;
       }
 

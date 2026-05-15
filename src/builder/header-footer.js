@@ -26,9 +26,11 @@ const { ALIGN_MAP } = require("./page");
 function makeRuns(runs, defaults) {
   const out = [];
   for (const run of (runs || [])) {
+    // SECTIONPAGES is not reliably resolved by some DOCX->PDF converters.
+    // Use TOTAL_PAGES so page totals remain visible in PDF output.
     const children = run.field === "PAGE_CURRENT"        ? [PageNumber.CURRENT]
                    : run.field === "PAGE_TOTAL"          ? [PageNumber.TOTAL_PAGES]
-                   : run.field === "PAGE_SECTION_TOTAL"  ? [PageNumber.TOTAL_PAGES_IN_SECTION]
+                   : run.field === "PAGE_SECTION_TOTAL"  ? [PageNumber.TOTAL_PAGES]
                    : undefined;
     out.push(new TextRun({
       text:    run.text,

@@ -9,13 +9,13 @@
 <!-- @page-break -->
 
 <!-- Table of contents -->
-# Table of Contents {.no-num}
+# Table of Contents {.no-num .center}
 <!-- @toc -->
 
 <!-- @page-break -->
 
 <!-- List of figures -->
-# List of Figures {.no-num}
+# List of Figures {.no-num .center}
 <!-- @list: figures -->
 
 <!-- @page-break -->

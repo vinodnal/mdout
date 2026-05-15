@@ -150,7 +150,7 @@ function createElementsRenderer({
     const clampedLevel = Math.max(1, Math.min(4, level || 1));
     const isArabic = hasArabic(clean);
     const para = {
-      alignment: opts.alignment ?? (isArabic ? AlignmentType.RIGHT : (opts.nonumber ? AlignmentType.CENTER : undefined)),
+      alignment: opts.alignment ?? (isArabic ? AlignmentType.RIGHT : undefined),
       children:  [new TextRun(clean)],
     };
     if (!opts.nonumber) {

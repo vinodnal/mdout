@@ -41,6 +41,7 @@ ${C.bold}Shared options:${C.reset}
   -o, --out <path>            Output directory (images) or file path (md)
       --no-build              Skip DOCX build — use existing output DOCX/PDF
       --soffice <path>        Override LibreOffice soffice path
+      --pdf-engine <name>     PDF engine: auto|word|libreoffice (default: auto)
       --var <key=value>       Override project.config.js variable (repeatable)
       --json [path]           Write export result as JSON (omit path → stdout)
 
@@ -96,6 +97,7 @@ ${C.bold}Build options:${C.reset}
       --no-pdf                 Skip PDF conversion
   -o, --out <path>             Override output path from project.config.js
       --soffice <path>         Path to soffice binary (auto-detected by default)
+      --pdf-engine <name>      PDF engine: auto|word|libreoffice (default: auto)
       --var <key=value>        Override a project.config.js variable (repeatable)
       --json [path]            Write build result as JSON (omit path → stdout)
       --watch                  Watch project files and rebuild on changes
