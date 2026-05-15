@@ -30,12 +30,11 @@
 - **Cover page** — Markdown file or built-in cover builder (array of styled text entries and spacers)
 - **Rich headers/footers** — simple text or full run-level control with bold/italic/color/field substitution (`PAGE_CURRENT`, `PAGE_TOTAL`); per-section override
 - **Watch mode** — `--watch` debounced rebuilds while you edit; Windows-friendly file-lock retry
-- **PDF generation** — via LibreOffice on Linux/macOS; tries Microsoft Word COM first on Windows
+- **PDF generation** — via LibreOffice on Linux/macOS; tries Microsoft Word COM first on Windows; force with `--pdf-engine word|libreoffice`
 - **Export to images** — `mdoc export images` converts any project's PDF to PNG/JPEG pages via pdftoppm (preferred) or Ghostscript; select pages with `--pages 1,3-5`, set DPI with `--dpi`, choose format with `--image-format`
 - **Export to flat Markdown** — `mdoc export md` flattens all imported Markdown files and executes figure scripts to produce a single self-contained `.md` file; ideal for AI agent ingestion
-- **Machine-readable output** — `--json [path]` writes a structured result object after any export; combine with `--no-build` to skip rebuilding when DOCX is already up-to-date
 
----
+- **Machine-readable output** — `--json [path]` writes a structured result object after any export; combine with `--no-build` to skip rebuilding when DOCX is already up-to-date
 
 ## Requirements
 
@@ -79,6 +78,10 @@ mdoc --watch --no-pdf projects/my-thesis
 
 # Convert an existing DOCX to PDF (no rebuild)
 mdoc --pdf-only projects/my-thesis
+
+# Force Word output on Windows, or LibreOffice if you need a fallback path
+mdoc --pdf-engine word projects/my-thesis
+mdoc --pdf-engine libreoffice projects/my-thesis
 
 # Override output path
 mdoc -o ./dist/output.docx projects/my-thesis
@@ -348,6 +351,7 @@ Options (build):
       --no-pdf            Skip PDF generation
   -o, --out <path>        Override output path from config
       --soffice <path>    Path to soffice executable (auto-detected)
+      --pdf-engine <name>  PDF engine: auto|word|libreoffice (default: auto)
       --watch             Rebuild on file changes (debounced)
       --watch-debounce N  Debounce delay in ms (default: 300)
       --var key=val       Override a project.config.js variable
@@ -380,7 +384,7 @@ mdoc export images --pages 1-3 --dpi 300 projects/my-thesis
 mdoc export md --out ./flat.md projects/my-thesis
 ```
 
-> **Note:** PDF generation requires [LibreOffice](https://www.libreoffice.org/) (`soffice` on PATH). On Windows, if Microsoft Word is installed, it is tried first.
+> **Note:** PDF generation uses LibreOffice by default and will try Microsoft Word COM first on Windows. Use `--pdf-engine word` to force Word, or `--pdf-engine libreoffice` to force LibreOffice. Word PDF output is configured for print-quality rendering and keeps embedded figure compression disabled when possible.
 
 ---
 
