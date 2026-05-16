@@ -1,5 +1,5 @@
 {
-  "name": "mdout",
+  "name": "markfi",
   "version": "1.0.0",
   "description": "Markdown → DOCX, PDF, HTML, and presentation builder for developers and AI agents. Write documents in Markdown, compile to professional Word documents, PDFs, and more.",
   "main": "src/index.js",
@@ -8,7 +8,7 @@
     "./canvas-utils": "./src/canvas-utils.js"
   },
   "bin": {
-    "mdout": "./bin/mdoc.js"
+    "markfi": "./bin/mdoc.js"
   },
   "files": [
     "src/",
@@ -49,11 +49,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vinodnal/mdout.git"
+    "url": "git+https://github.com/vinodnal/markfi.git"
   },
-  "homepage": "https://github.com/vinodnal/mdout#readme",
+  "homepage": "https://github.com/vinodnal/markfi#readme",
   "bugs": {
-    "url": "https://github.com/vinodnal/mdout/issues"
+    "url": "https://github.com/vinodnal/markfi/issues"
   },
   "engines": {
     "node": ">=18.0.0",

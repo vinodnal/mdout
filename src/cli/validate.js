@@ -1,6 +1,6 @@
 /**
  * src/cli/validate.js
- * Implementation of the "mdout validate" command.
+ * Implementation of the "markfi validate" command.
  */
 "use strict";
 

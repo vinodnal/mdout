@@ -305,7 +305,7 @@ function parseExportArgs(args) {
       }
 
       default:
-        if (a.startsWith("-")) die(`Unknown option: ${a}\nRun 'mdout export --help' for usage.`);
+        if (a.startsWith("-")) die(`Unknown option: ${a}\nRun 'markfi export --help' for usage.`);
         // Positional: first = format shorthand (images/md/png/jpg) or project dir
         if (!opts.projectDir) {
           if (Object.prototype.hasOwnProperty.call(EXPORT_FORMAT_ALIASES, a.toLowerCase())) {
