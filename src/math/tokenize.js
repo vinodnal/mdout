@@ -1,6 +1,6 @@
 /**
  * src/math/tokenize.js
- * LaTeX tokenizer for the mdoc math parser.
+ * LaTeX tokenizer for the mdout math parser.
  *
  * Splits a raw LaTeX string into a flat array of typed tokens consumed by
  * the recursive-descent parser in src/math/parse.js.

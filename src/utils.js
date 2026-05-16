@@ -1,6 +1,6 @@
 /**
  * src/utils.js
- * Shared low-level utilities for mdoc.
+ * Shared low-level utilities for mdout.
  *
  * Centralises retry-with-backoff logic and transient FS error detection
  * so that builder.js, importer.js, and other modules don't duplicate them.

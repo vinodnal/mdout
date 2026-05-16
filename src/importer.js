@@ -10,7 +10,7 @@
  *   .docx        — embedded via AltChunk (type: embed) or text-extracted (type: extract)
  *
  * Usage:
- *   const { createImporter } = require('mdoc/src/importer');
+ *   const { createImporter } = require('mdout/src/importer');
  *   const handleImport = createImporter(R, parseFn, opts);
  *   // opts.trackArtifact  — called with absolute paths of generated files
  *   // opts.logger         — structured logger
@@ -27,7 +27,7 @@ const { IMAGE_EXTS, SCRIPT_EXTS, runtimeForScriptExt } = require("./import-types
 function extractDocxTextSync(absPath) {
   const script = [
     "const mammoth=require('mammoth');",
-    "const p=process.env.MDOC_DOCX_PATH;",
+    "const p=process.env.MDOUT_DOCX_PATH;",
     "mammoth.extractRawText({ path: p })",
     "  .then(r=>process.stdout.write((r && r.value) || ''))",
     "  .catch(e=>{ console.error(e && e.message ? e.message : String(e)); process.exit(1); });",
@@ -38,7 +38,7 @@ function extractDocxTextSync(absPath) {
     encoding: "utf-8",
     timeout: 30000,
     maxBuffer: 10 * 1024 * 1024,
-    env: { ...process.env, MDOC_DOCX_PATH: absPath },
+    env: { ...process.env, MDOUT_DOCX_PATH: absPath },
   });
 }
 

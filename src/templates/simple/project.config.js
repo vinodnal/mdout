@@ -2,7 +2,7 @@
  * project.config.js — Simple document project
  *
  * Edit this file to configure your document.
- * Run "mdoc build ." from this directory to compile.
+ * Run "mdout build ." from this directory to compile.
  */
 "use strict";
 
@@ -13,7 +13,7 @@ module.exports = {
   meta: {
     author:   "Your Name",
     subject:  "A simple document",
-    keywords: ["document", "mdoc"],
+    keywords: ["document", "mdout"],
   },
 
   // ── Input & output ─────────────────────────────────────────────────────────

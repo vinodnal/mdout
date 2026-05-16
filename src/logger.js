@@ -1,6 +1,6 @@
 /**
  * src/logger.js
- * Structured logger with warning/error codes for mdoc.
+ * Structured logger with warning/error codes for mdout.
  *
  * Warning/Error codes:
  *   W001  Missing import file (resolved but not found — build continues)

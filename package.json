@@ -8,7 +8,7 @@
     "./canvas-utils": "./src/canvas-utils.js"
   },
   "bin": {
-    "mdout": "./bin/mdoc.js"
+    "mdout": "./bin/mdout.js"
   },
   "files": [
     "src/",
@@ -19,13 +19,13 @@
     "LICENSE"
   ],
   "scripts": {
-    "start": "node bin/mdoc.js",
+    "start": "node bin/mdout.js",
     "lint": "eslint src/ bin/",
     "lint:fix": "eslint src/ bin/ --fix",
     "test": "node --test src/**/*.test.js 2>/dev/null || echo 'No tests yet'",
-    "validate": "node bin/mdoc.js validate",
-    "build:example": "node bin/mdoc.js --no-pdf projects/these-hmh2",
-    "build:example:pdf": "node bin/mdoc.js projects/these-hmh2",
+    "validate": "node bin/mdout.js validate",
+    "build:example": "node bin/mdout.js --no-pdf projects/these-hmh2",
+    "build:example:pdf": "node bin/mdout.js projects/these-hmh2",
     "prepublishOnly": "pnpm run lint"
   },
   "keywords": [

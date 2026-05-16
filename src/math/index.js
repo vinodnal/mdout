@@ -1,6 +1,6 @@
 /**
  * src/math/index.js
- * Public API for the mdoc math subsystem.
+ * Public API for the mdout math subsystem.
  *
  * Combines the symbol tables, tokenizer, and recursive parser into two
  * high-level functions consumed by the renderer:

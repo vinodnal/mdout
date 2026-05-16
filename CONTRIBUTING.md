@@ -13,7 +13,7 @@ cd mdout
 pnpm install
 
 # Verify everything works
-node bin/mdoc.js --version
+node bin/mdout.js --version
 ```
 
 ## Development Workflow

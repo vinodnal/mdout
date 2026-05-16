@@ -1,21 +1,21 @@
 /**
  * src/index.js
- * Public programmatic API for mdoc.
+ * Public programmatic API for mdout.
  *
  * Usage:
- *   const mdoc = require('mdoc');
- *   await mdoc.build('./my-project/project.config.js', { verbose: true });
+ *   const mdout = require('mdout');
+ *   await mdout.build('./my-project/project.config.js', { verbose: true });
  *
  *   // Or with a raw config object:
  *   const cfg = require('./project.config.js');
  *   cfg._dir = __dirname;
- *   await mdoc.buildFromConfig(cfg);
+ *   await mdout.buildFromConfig(cfg);
  *
  *   // Validate only:
- *   const { valid, errors } = await mdoc.validate('./project.config.js');
+ *   const { valid, errors } = await mdout.validate('./project.config.js');
  *
  *   // Use the renderer directly:
- *   const R = mdoc.createRenderer(theme, pageConfig, vars, logger);
+ *   const R = mdout.createRenderer(theme, pageConfig, vars, logger);
  */
 "use strict";
 

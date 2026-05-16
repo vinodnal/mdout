@@ -36,10 +36,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Per-section header/footer and page number overrides via `config.sections[]`
 - PDF generation via LibreOffice; Word COM fallback on Windows
 - `--watch` mode with configurable debounce; Windows-friendly file-lock retry
-- `mdoc validate` — pre-build validation (missing imports, undefined variables, circular imports)
-- `mdoc init` — scaffold new projects from `simple`, `report`, `thesis`, `manual` templates
+- `mdout validate` — pre-build validation (missing imports, undefined variables, circular imports)
+- `mdout init` — scaffold new projects from `simple`, `report`, `thesis`, `manual` templates
 - `src/canvas-utils.js` — shared drawing primitives (`background`, `title`, `chartArea`, `hGrid`, `vGrid`, `axes`, `roundRect`, `drawBox`, `drawArrow`, `drawLegend`, `saveAndPrint`)
-- Programmatic API (`mdoc.build`, `mdoc.buildFromConfig`, `mdoc.validate`)
+- Programmatic API (`mdout.build`, `mdout.buildFromConfig`, `mdout.validate`)
 - Structured logger with codes W001–W005, E001–E004
 - Config schema validation with detailed error messages
 

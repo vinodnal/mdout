@@ -3,10 +3,10 @@
  * Pre-build validation — checks imports, variables, circular refs, broken paths.
  *
  * Usage (CLI):
- *   mdoc validate path/to/project.config.js [--dep-graph]
+ *   mdout validate path/to/project.config.js [--dep-graph]
  *
  * Usage (programmatic):
- *   const { validate } = require('mdoc/src/validator');
+ *   const { validate } = require('mdout/src/validator');
  *   const { valid, errors, warnings } = await validate(configPath, opts);
  *
  * Emits:

@@ -151,7 +151,7 @@ mdout/
 │       └── pages.js       — Page range parser + executable finder
 │
 ├── bin/
-│   └── mdoc.js            — CLI executable entry point
+│   └── mdout.js            — CLI executable entry point
 │
 ├── projects/              — Your document projects (git-ignored)
 │   └── my-project/

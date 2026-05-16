@@ -6,7 +6,7 @@
  * buildFromConfig() calls validateConfig() before building.
  *
  * Usage:
- *   const { validateConfig } = require('mdoc/src/schema');
+ *   const { validateConfig } = require('mdout/src/schema');
  *   const { valid, errors, warnings, config } = validateConfig(raw);
  */
 "use strict";

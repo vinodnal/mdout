@@ -9,7 +9,7 @@ Year: {{year}}
 
 ## Introduction
 
-Write your content here. You can use all standard Markdown syntax plus mdoc directives.
+Write your content here. You can use all standard Markdown syntax plus mdout directives.
 
 ### Text Formatting
 
@@ -21,7 +21,7 @@ Use `inline code` for technical terms.
 
 ### Links and Math
 
-Visit [mdoc documentation](https://github.com/walid-pfe/mdoc) for more.
+Visit [mdout documentation](https://github.com/walid-pfe/mdout) for more.
 
 Inline math: $E = mc^2$
 

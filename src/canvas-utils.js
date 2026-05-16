@@ -3,7 +3,7 @@
  * Shared canvas drawing utilities for figure scripts.
  *
  * Usage in a figure script:
- *   const u = require('mdoc/src/canvas-utils');
+ *   const u = require('mdout/src/canvas-utils');
  *   // — or, from a project's figures folder —
  *   const u = require('../../../src/canvas-utils');
  *   const { createCanvas } = u;

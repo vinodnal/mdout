@@ -1,6 +1,6 @@
-# mdoc Usage Guide
+# mdout Usage Guide
 
-**mdoc** — Markdown → Word/PDF document builder.  
+**mdout** — Markdown → Word/PDF document builder.  
 Write documents in Markdown, import images/scripts/other docs, compile to professional DOCX and PDF.
 
 ---
@@ -27,24 +27,24 @@ Write documents in Markdown, import images/scripts/other docs, compile to profes
 ### Installation (as a project dependency)
 
 ```bash
-npm install mdoc
+npm install mdout
 ```
 
 ### Running locally (from the workspace root)
 
 ```bash
 # from this repository checkout:
-node bin/mdoc.js <project-dir>
+node bin/mdout.js <project-dir>
 # or, if installed globally / via npx:
-mdoc <project-dir>
+mdout <project-dir>
 ```
 
 ### Scaffold a new project
 
 ```bash
-mdoc init --template report ./projects/my-report
+mdout init --template report ./projects/my-report
 cd ./projects/my-report
-mdoc build .
+mdout build .
 ```
 
 Available templates: `simple` | `report` | `thesis` | `manual`
@@ -56,20 +56,20 @@ Available templates: `simple` | `report` | `thesis` | `manual`
 ### Commands
 
 ```
-mdoc [build] [options] <project-dir>     Build DOCX (and optionally PDF)
-mdoc export [format] [options] <project-dir>  Export to images or flat Markdown
-mdoc validate [options] <project-dir>    Validate imports and variables without building
-mdoc init [options] <new-dir>            Scaffold a new project from a template
+mdout [build] [options] <project-dir>     Build DOCX (and optionally PDF)
+mdout export [format] [options] <project-dir>  Export to images or flat Markdown
+mdout validate [options] <project-dir>    Validate imports and variables without building
+mdout init [options] <new-dir>            Scaffold a new project from a template
 ```
 
 When no command is given and the first argument is a path, `build` is assumed.
 
 ---
 
-### `mdoc build` (default)
+### `mdout build` (default)
 
 ```bash
-mdoc [build] [options] <project-dir>
+mdout [build] [options] <project-dir>
 ```
 
 **Options:**
@@ -94,41 +94,41 @@ mdoc [build] [options] <project-dir>
 
 ```bash
 # DOCX + PDF
-mdoc -p projects/my-thesis
+mdout -p projects/my-thesis
 
 # Watch mode, no PDF (faster rebuild loop)
-mdoc --watch --no-pdf projects/my-thesis
+mdout --watch --no-pdf projects/my-thesis
 
 # Verbose with custom output
-mdoc -v -o ./dist/final.docx projects/my-thesis
+mdout -v -o ./dist/final.docx projects/my-thesis
 
 # PDF from existing DOCX without rebuilding
-mdoc --pdf-only projects/my-thesis
+mdout --pdf-only projects/my-thesis
 
 # Custom LibreOffice path (Windows)
-mdoc --soffice "C:\Program Files\LibreOffice\program\soffice.exe" -p projects/my-thesis
+mdout --soffice "C:\Program Files\LibreOffice\program\soffice.exe" -p projects/my-thesis
 
 # Force Word engine (Windows only)
-mdoc --pdf-engine word -p projects/my-thesis
+mdout --pdf-engine word -p projects/my-thesis
 
 # Force LibreOffice engine
-mdoc --pdf-engine libreoffice -p projects/my-thesis
+mdout --pdf-engine libreoffice -p projects/my-thesis
 
 # Override project variables
-mdoc --var year=2027 --var author="Jane Smith" projects/my-thesis
+mdout --var year=2027 --var author="Jane Smith" projects/my-thesis
 
 # Write result JSON for pipeline use
-mdoc --json ./result.json projects/my-thesis
+mdout --json ./result.json projects/my-thesis
 ```
 
 ---
 
-### `mdoc validate`
+### `mdout validate`
 
 Crawl all imports recursively and report errors/warnings without producing output files.
 
 ```bash
-mdoc validate [--dep-graph] <project-dir|project.config.js>
+mdout validate [--dep-graph] <project-dir|project.config.js>
 ```
 
 **Options:**
@@ -146,12 +146,12 @@ mdoc validate [--dep-graph] <project-dir|project.config.js>
 
 ---
 
-### `mdoc init`
+### `mdout init`
 
 Scaffold a new project directory from a built-in template.
 
 ```bash
-mdoc init [--template <name>] <new-dir>
+mdout init [--template <name>] <new-dir>
 ```
 
 **Templates:**
@@ -164,19 +164,19 @@ mdoc init [--template <name>] <new-dir>
 | `manual` | Technical manual with sections |
 
 ```bash
-mdoc init ./my-doc                          # simple template (default)
-mdoc init --template report ./reports/q1
-mdoc init --template thesis ./thesis
+mdout init ./my-doc                          # simple template (default)
+mdout init --template report ./reports/q1
+mdout init --template thesis ./thesis
 ```
 
 ---
 
-### `mdoc export`
+### `mdout export`
 
 Export a built project to image files (one per PDF page) and/or a single flat Markdown file. Designed for AI agent document ingestion and automated pipelines.
 
 ```bash
-mdoc export [format] [options] <project-dir>
+mdout export [format] [options] <project-dir>
 ```
 
 **Formats** — one or more, space-separated or via `-f`:
@@ -246,25 +246,25 @@ When exporting both formats in one command, avoid `--out` because images expect 
 
 ```bash
 # Export both images and flat MD (full build included)
-mdoc export projects/my-thesis
+mdout export projects/my-thesis
 
 # Images only, pages 1–5 at 200 DPI as JPEG
-mdoc export images --pages 1-5 --dpi 200 --image-format jpg projects/my-thesis
+mdout export images --pages 1-5 --dpi 200 --image-format jpg projects/my-thesis
 
 # Export a specific single page
-mdoc export images --pages 7 projects/my-thesis
+mdout export images --pages 7 projects/my-thesis
 
 # Flat Markdown without cover, custom output path
-mdoc export md --no-cover --out ./ai-input/thesis.md projects/my-thesis
+mdout export md --no-cover --out ./ai-input/thesis.md projects/my-thesis
 
 # Re-export images from existing build (no rebuild)
-mdoc export images --no-build --dpi 150 projects/my-thesis
+mdout export images --no-build --dpi 150 projects/my-thesis
 
 # Both formats, write JSON manifest for CI pipeline
-mdoc export --no-build --json ./export-result.json projects/my-thesis
+mdout export --no-build --json ./export-result.json projects/my-thesis
 
 # Override a variable then export
-mdoc export md --var year=2027 projects/my-thesis
+mdout export md --var year=2027 projects/my-thesis
 ```
 
 **JSON result structure** (when `--json` is used):
@@ -1047,7 +1047,7 @@ The script is executed; its stdout determines what is imported:
 **Example script:**
 
 ```js
-const u = require('mdoc/canvas-utils');
+const u = require('mdout/canvas-utils');
 const path = require('path');
 
 const OUT = path.join(__dirname, '_pareto.png');
@@ -1082,7 +1082,7 @@ u.saveAndPrint(canvas, OUT);   // prints the path to stdout
 Use `core/canvas-utils.js` to generate figures programmatically from `.js` scripts.
 
 ```js
-const u = require('mdoc/canvas-utils');
+const u = require('mdout/canvas-utils');
 ```
 
 ### API Reference
@@ -1106,7 +1106,7 @@ const u = require('mdoc/canvas-utils');
 ### Example: Bar Chart
 
 ```js
-const u = require('mdoc/canvas-utils');
+const u = require('mdout/canvas-utils');
 const path = require('path');
 
 const OUT = path.join(__dirname, '_chart.png');
@@ -1141,22 +1141,22 @@ u.saveAndPrint(canvas, OUT);
 
 ## Export Command
 
-See [mdoc export](#mdoc-export) in the CLI Reference above.
+See [mdout export](#mdout-export) in the CLI Reference above.
 
 ---
 
 ## Programmatic API
 
 ```js
-const mdoc = require('mdoc');
+const mdout = require('mdout');
 ```
 
-### `mdoc.build(configPath, opts)` → `Promise<result>`
+### `mdout.build(configPath, opts)` → `Promise<result>`
 
 High-level build from a config file path.
 
 ```js
-const result = await mdoc.build('./projects/my-report/project.config.js', {
+const result = await mdout.build('./projects/my-report/project.config.js', {
   verbose:     true,
   pdf:         true,
   sofficePath: '/usr/bin/soffice',
@@ -1164,20 +1164,20 @@ const result = await mdoc.build('./projects/my-report/project.config.js', {
 // result: { outputPath, byteLength, sectionCount, warnings }
 ```
 
-### `mdoc.buildFromConfig(rawConfig, opts)` → `Promise<result>`
+### `mdout.buildFromConfig(rawConfig, opts)` → `Promise<result>`
 
 Build from a raw config object. Set `rawConfig._dir` to the project directory.
 
 ```js
 const cfg = require('./project.config.js');
 cfg._dir = __dirname;
-const result = await mdoc.buildFromConfig(cfg, { logger: myLogger });
+const result = await mdout.buildFromConfig(cfg, { logger: myLogger });
 ```
 
-### `mdoc.validate(configPath, opts)` → `Promise<result>`
+### `mdout.validate(configPath, opts)` → `Promise<result>`
 
 ```js
-const { valid, errors, warnings, imports } = await mdoc.validate('./project.config.js', {
+const { valid, errors, warnings, imports } = await mdout.validate('./project.config.js', {
   depGraph: true,   // write dependency.json
 });
 ```
@@ -1193,7 +1193,7 @@ const {
   createLogger,     // (opts) → logger
   makeNullLogger,   // () → silent logger
   CODES,            // warning/error code constants
-} = require('mdoc');
+} = require('mdout');
 ```
 
 ---
@@ -1208,7 +1208,7 @@ const {
   flattenToMarkdown,
   parsePageSpec,
   findExecutable,
-} = require('mdoc');
+} = require('mdout');
 ```
 
 #### `exportPdfToImages(pdfPath, opts)` → `Promise<{ page, path }[]>`
@@ -1266,7 +1266,7 @@ parsePageSpec(null,      4)   // → [1, 2, 3, 4]
 
 ### `No project.config.js found`
 
-Create `project.config.js` with the required `name`, `input`, `output` fields. Run `mdoc validate .` to check without building.
+Create `project.config.js` with the required `name`, `input`, `output` fields. Run `mdout validate .` to check without building.
 
 ---
 
@@ -1324,10 +1324,10 @@ The formula uses unsupported LaTeX — it falls back to Unicode text. Simplify t
 
 ### PDF fails: `LibreOffice not found`
 
-- **Windows:** `mdoc --soffice "C:\Program Files\LibreOffice\program\soffice.exe" -p .`
+- **Windows:** `mdout --soffice "C:\Program Files\LibreOffice\program\soffice.exe" -p .`
 - **macOS:** `brew install libreoffice`
 - **Linux:** `sudo apt-get install libreoffice`
-- **Skip PDF:** `mdoc --no-pdf .`
+- **Skip PDF:** `mdout --no-pdf .`
 
 ---
 
@@ -1456,16 +1456,16 @@ module.exports = {
 
 | Task | Command |
 |------|---------|
-| Build DOCX | `mdoc projects/my-doc` |
-| Build DOCX + PDF | `mdoc -p projects/my-doc` |
-| Build verbose, no PDF | `mdoc -v --no-pdf projects/my-doc` |
-| PDF from existing DOCX | `mdoc --pdf-only projects/my-doc` |
-| Quiet mode (errors only) | `mdoc -q projects/my-doc` |
-| Custom output path | `mdoc -o ./dist/out.docx projects/my-doc` |
-| Watch mode | `mdoc --watch --no-pdf projects/my-doc` |
-| Validate only | `mdoc validate projects/my-doc` |
-| Validate + dependency graph | `mdoc validate --dep-graph projects/my-doc` |
-| Scaffold simple project | `mdoc init ./my-doc` |
-| Scaffold thesis | `mdoc init --template thesis ./my-thesis` |
-| Help | `mdoc --help` |
-| Version | `mdoc --version` |
+| Build DOCX | `mdout projects/my-doc` |
+| Build DOCX + PDF | `mdout -p projects/my-doc` |
+| Build verbose, no PDF | `mdout -v --no-pdf projects/my-doc` |
+| PDF from existing DOCX | `mdout --pdf-only projects/my-doc` |
+| Quiet mode (errors only) | `mdout -q projects/my-doc` |
+| Custom output path | `mdout -o ./dist/out.docx projects/my-doc` |
+| Watch mode | `mdout --watch --no-pdf projects/my-doc` |
+| Validate only | `mdout validate projects/my-doc` |
+| Validate + dependency graph | `mdout validate --dep-graph projects/my-doc` |
+| Scaffold simple project | `mdout init ./my-doc` |
+| Scaffold thesis | `mdout init --template thesis ./my-thesis` |
+| Help | `mdout --help` |
+| Version | `mdout --version` |
