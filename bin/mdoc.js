@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * bin/mdoc.js — markfi CLI entry point
+ * bin/mdoc.js — mddg CLI entry point
  * Delegates to src/cli/index.js
  */
 "use strict";

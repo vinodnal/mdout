@@ -1,5 +1,5 @@
 {
-  "name": "markfi",
+  "name": "mddg",
   "version": "1.0.0",
   "description": "Markdown → DOCX, PDF, HTML, and presentation builder for developers and AI agents. Write documents in Markdown, compile to professional Word documents, PDFs, and more.",
   "main": "src/index.js",
@@ -8,7 +8,7 @@
     "./canvas-utils": "./src/canvas-utils.js"
   },
   "bin": {
-    "markfi": "./bin/mdoc.js"
+    "mddg": "./bin/mdoc.js"
   },
   "files": [
     "src/",
@@ -49,11 +49,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vinodnal/markfi.git"
+    "url": "git+https://github.com/vinodnal/mddg.git"
   },
-  "homepage": "https://github.com/vinodnal/markfi#readme",
+  "homepage": "https://github.com/vinodnal/mddg#readme",
   "bugs": {
-    "url": "https://github.com/vinodnal/markfi/issues"
+    "url": "https://github.com/vinodnal/mddg/issues"
   },
   "engines": {
     "node": ">=18.0.0",

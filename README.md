@@ -1,11 +1,11 @@
-# markfi
+# mddg
 
 > **Markdown → DOCX / PDF / HTML document builder** for Node.js — write your documents in plain Markdown, configure once, compile to polished Word documents, PDFs, and more.
 
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![CI](https://github.com/vinodnal/markfi/actions/workflows/ci.yml/badge.svg)](https://github.com/vinodnal/markfi/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/markfi)](https://www.npmjs.com/package/markfi)
+[![CI](https://github.com/vinodnal/mddg/actions/workflows/ci.yml/badge.svg)](https://github.com/vinodnal/mddg/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/mddg)](https://www.npmjs.com/package/mddg)
 
 ---
 
@@ -34,7 +34,7 @@
 - **Watch mode** — `--watch` debounced rebuilds while you edit; Windows-friendly file-lock retry
 - **PDF generation** — via LibreOffice on Linux/macOS; tries Microsoft Word COM first on Windows; force with `--pdf-engine word|libreoffice`
 - **Export to images** — `mdoc export images` converts any project's PDF to PNG/JPEG pages via pdftoppm (preferred) or Ghostscript; select pages with `--pages 1,3-5`, set DPI with `--dpi`, choose format with `--image-format`
-- **Export to flat Markdown** — `markfi export md` flattens all imported Markdown files and executes figure scripts to produce a single self-contained `.md` file; ideal for AI agent ingestion
+- **Export to flat Markdown** — `mddg export md` flattens all imported Markdown files and executes figure scripts to produce a single self-contained `.md` file; ideal for AI agent ingestion
 
 - **Machine-readable output** — `--json [path]` writes a structured result object after any export; combine with `--no-build` to skip rebuilding when DOCX is already up-to-date
 
@@ -51,20 +51,20 @@
 
 ```bash
 # Install from npm
-npm install -g markfi
+npm install -g mddg
 
 # Or with pnpm
-pnpm add -g markfi
+pnpm add -g mddg
 ```
 
 ### Development / from source
 
 ```bash
-git clone https://github.com/vinodnal/markfi.git
-cd markfi
+git clone https://github.com/vinodnal/mddg.git
+cd mddg
 pnpm install
 
-# Make the markfi command available globally (optional)
+# Make the mddg command available globally (optional)
 pnpm install -g .
 ```
 
@@ -74,51 +74,51 @@ pnpm install -g .
 
 ```bash
 # Scaffold a new project from a template
-markfi init --template thesis ./my-thesis
-markfi init --template report ./reports/q1
+mddg init --template thesis ./my-thesis
+mddg init --template report ./reports/q1
 
 # Build a project (generates DOCX + PDF)
-markfi projects/my-thesis
+mddg projects/my-thesis
 
 # DOCX only (no PDF)
-markfi --no-pdf projects/my-thesis
+mddg --no-pdf projects/my-thesis
 
 # Verbose output with per-step timings
-markfi -v projects/my-thesis
+mddg -v projects/my-thesis
 
 # Watch files and rebuild after changes
-markfi --watch --no-pdf projects/my-thesis
+mddg --watch --no-pdf projects/my-thesis
 
 # Convert an existing DOCX to PDF (no rebuild)
-markfi --pdf-only projects/my-thesis
+mddg --pdf-only projects/my-thesis
 
 # Force Word output on Windows, or LibreOffice if you need a fallback path
-markfi --pdf-engine word projects/my-thesis
-markfi --pdf-engine libreoffice projects/my-thesis
+mddg --pdf-engine word projects/my-thesis
+mddg --pdf-engine libreoffice projects/my-thesis
 
 # Override output path
-markfi -o ./dist/output.docx projects/my-thesis
+mddg -o ./dist/output.docx projects/my-thesis
 
 # Validate imports and variables without building
-markfi validate projects/my-thesis
+mddg validate projects/my-thesis
 
 # Show all CLI options
-markfi --help
+mddg --help
 
 # Export all pages as PNG images (builds DOCX → PDF → images)
-markfi export projects/my-thesis
+mddg export projects/my-thesis
 
 # Export specific pages at high DPI
-markfi export images --pages 1,3-5 --dpi 200 projects/my-thesis
+mddg export images --pages 1,3-5 --dpi 200 projects/my-thesis
 
 # Flatten entire document to a single Markdown file for AI agents
-markfi export md --out ./thesis_flat.md projects/my-thesis
+mddg export md --out ./thesis_flat.md projects/my-thesis
 
 # Re-export images from an existing DOCX without rebuilding
-markfi export images --no-build --pages 2- projects/my-thesis
+mddg export images --no-build --pages 2- projects/my-thesis
 
 # Export help
-markfi export --help
+mddg export --help
 ```
 
 ---
@@ -126,7 +126,7 @@ markfi export --help
 ## Project Structure
 
 ```
-markfi/
+mddg/
 ├── src/
 │   ├── cli.js             — CLI argument parsing and commands
 │   ├── builder.js         — Assembles Document from config
@@ -282,7 +282,7 @@ module.exports = {
 4. Build:
 
 ```bash
-markfi projects/my-report
+mddg projects/my-report
 # Output: my-report.docx and my-report.pdf (if LibreOffice is available)
 ```
 
@@ -349,10 +349,10 @@ u.saveAndPrint(canvas, OUT);
 ## CLI Reference
 
 ```
-markfi [build] [options] <project-dir>
-markfi export [format] [options] <project-dir>
-markfi validate [--dep-graph] <project-dir|config-path>
-markfi init [--template <name>] <new-dir>
+mddg [build] [options] <project-dir>
+mddg export [format] [options] <project-dir>
+mddg validate [--dep-graph] <project-dir|config-path>
+mddg init [--template <name>] <new-dir>
 
 Options (build):
   -h, --help              Show help and exit
@@ -385,16 +385,16 @@ Options (export):
 
 **Examples:**
 ```bash
-markfi projects/my-report                          # DOCX + PDF
-markfi -v --no-pdf projects/my-report              # DOCX only, verbose
-markfi --pdf-only projects/my-report               # PDF from existing DOCX
-markfi -o ./dist/output.docx projects/my-report
-markfi --watch projects/my-thesis                  # watch mode
-markfi validate projects/my-report                 # validate only, no build
-markfi init --template thesis ./new-thesis         # scaffold from template
-markfi export projects/my-thesis                   # images + flat MD
-markfi export images --pages 1-3 --dpi 300 projects/my-thesis
-markfi export md --out ./flat.md projects/my-thesis
+mddg projects/my-report                          # DOCX + PDF
+mddg -v --no-pdf projects/my-report              # DOCX only, verbose
+mddg --pdf-only projects/my-report               # PDF from existing DOCX
+mddg -o ./dist/output.docx projects/my-report
+mddg --watch projects/my-thesis                  # watch mode
+mddg validate projects/my-report                 # validate only, no build
+mddg init --template thesis ./new-thesis         # scaffold from template
+mddg export projects/my-thesis                   # images + flat MD
+mddg export images --pages 1-3 --dpi 300 projects/my-thesis
+mddg export md --out ./flat.md projects/my-thesis
 ```
 
 > **Note:** PDF generation uses LibreOffice by default and will try Microsoft Word COM first on Windows. Use `--pdf-engine word` to force Word, or `--pdf-engine libreoffice` to force LibreOffice. Word PDF output is configured for print-quality rendering and keeps embedded figure compression disabled when possible.
@@ -473,5 +473,5 @@ Starter templates are available under `src/templates/`:
 Create a new project from a template:
 
 ```bash
-markfi init --template thesis projects/my-thesis
+mddg init --template thesis projects/my-thesis
 ```

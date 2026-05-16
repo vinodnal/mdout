@@ -8,10 +8,10 @@ const { C, getVersion } = require("./utils");
 
 function makeHelp(cmd) {
   if (cmd === "validate") return `\
-${C.bold}markfi validate${C.reset} — Validate a project without building
+${C.bold}mddg validate${C.reset} — Validate a project without building
 
 ${C.bold}Usage:${C.reset}
-  markfi validate [options] <project-dir|project.config.js>
+  mddg validate [options] <project-dir|project.config.js>
 
 ${C.bold}Options:${C.reset}
   -h, --help        Show this help
@@ -23,10 +23,10 @@ ${C.bold}Exit codes:${C.reset}
 `;
 
   if (cmd === "export") return `\
-${C.bold}markfi export${C.reset} — Export a project to images or flat Markdown
+${C.bold}mddg export${C.reset} — Export a project to images or flat Markdown
 
 ${C.bold}Usage:${C.reset}
-  markfi export [format] [options] <project-dir|path.pdf>
+  mddg export [format] [options] <project-dir|path.pdf>
 
 ${C.bold}Formats:${C.reset}
   images        Convert PDF pages to PNG/JPEG images (default when both omitted)
@@ -57,18 +57,18 @@ ${C.bold}Markdown options:${C.reset}
       --no-cover              Omit cover.md from the flat output
 
 ${C.bold}Examples:${C.reset}
-  markfi export projects/my-thesis
-  markfi export images --pages 1,3-5 --dpi 200 projects/my-thesis
-  markfi export images --pages 7 projects/these-hmh2/these_hmh2.pdf
-  markfi export md --out ./thesis_flat.md projects/my-thesis
-  markfi export images md --no-build --out ./out projects/my-thesis
+  mddg export projects/my-thesis
+  mddg export images --pages 1,3-5 --dpi 200 projects/my-thesis
+  mddg export images --pages 7 projects/these-hmh2/these_hmh2.pdf
+  mddg export md --out ./thesis_flat.md projects/my-thesis
+  mddg export images md --no-build --out ./out projects/my-thesis
 `;
 
   if (cmd === "init") return `\
-${C.bold}markfi init${C.reset} — Scaffold a new project
+${C.bold}mddg init${C.reset} — Scaffold a new project
 
 ${C.bold}Usage:${C.reset}
-  markfi init [options] <new-dir>
+  mddg init [options] <new-dir>
 
 ${C.bold}Options:${C.reset}
   -h, --help                  Show this help
@@ -76,17 +76,17 @@ ${C.bold}Options:${C.reset}
       Templates: simple | report | thesis | manual
 
 ${C.bold}Example:${C.reset}
-  markfi init --template report ./my-report
+  mddg init --template report ./my-report
 `;
 
   return `\
-${C.bold}markfi${C.reset} — Markdown → DOCX/PDF/HTML document builder  v${getVersion()}
+${C.bold}mddg${C.reset} — Markdown → DOCX/PDF/HTML document builder  v${getVersion()}
 
 ${C.bold}Usage:${C.reset}
-  markfi [build] [options] <project-dir>
-  markfi export [format] [options] <project-dir>
-  markfi validate [--dep-graph] <project-dir>
-  markfi init [--template <name>] <new-dir>
+  mddg [build] [options] <project-dir>
+  mddg export [format] [options] <project-dir>
+  mddg validate [--dep-graph] <project-dir>
+  mddg init [--template <name>] <new-dir>
 
 ${C.bold}Build options:${C.reset}
   -h, --help                   Show this help and exit
@@ -104,15 +104,15 @@ ${C.bold}Build options:${C.reset}
       --watch-debounce <ms>    Debounce delay for watch mode (default: 300 ms)
 
 ${C.bold}Examples:${C.reset}
-  markfi projects/my-thesis
-  markfi -v --pdf projects/my-thesis
-  markfi --var author="Jane Doe" --var year=2026 projects/my-thesis
-  markfi --json result.json projects/my-thesis
-  markfi validate projects/my-thesis
-  markfi export projects/my-thesis
-  markfi export images --pages 1-5 --dpi 200 projects/my-thesis
-  markfi export md --out ./flat.md projects/my-thesis
-  markfi init --template thesis ./projects/new-thesis
+  mddg projects/my-thesis
+  mddg -v --pdf projects/my-thesis
+  mddg --var author="Jane Doe" --var year=2026 projects/my-thesis
+  mddg --json result.json projects/my-thesis
+  mddg validate projects/my-thesis
+  mddg export projects/my-thesis
+  mddg export images --pages 1-5 --dpi 200 projects/my-thesis
+  mddg export md --out ./flat.md projects/my-thesis
+  mddg init --template thesis ./projects/new-thesis
 `;
 }
 

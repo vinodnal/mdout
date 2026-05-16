@@ -1,6 +1,6 @@
 /**
  * src/cli/build.js
- * Implementation of the "markfi build" command.
+ * Implementation of the "mddg build" command.
  *
  * New over original:
  *   --var key=value   Inject/override project.config.js vars at build time.
@@ -36,7 +36,7 @@ async function runBuild(args) {
   if (!fs.existsSync(projectDir)) die(`Project directory not found: ${projectDir}`);
   if (!fs.existsSync(configPath)) die(
     `No project.config.js found in: ${projectDir}\n` +
-    `  Run "markfi init ${opts.projectDir}" to create one.`
+    `  Run "mddg init ${opts.projectDir}" to create one.`
   );
   if (opts.pdfOnly && opts.watch) die("--pdf-only cannot be used with --watch.");
 

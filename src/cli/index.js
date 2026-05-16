@@ -29,7 +29,7 @@ function run(argv) {
   }
 
   if (cmd === "--version" || cmd === "version") {
-    process.stdout.write(`markfi v${getVersion()}\n`);
+    process.stdout.write(`mddg v${getVersion()}\n`);
     return;
   }
 

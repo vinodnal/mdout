@@ -1,6 +1,6 @@
 /**
  * src/cli/init.js
- * Implementation of the "markfi init" command — scaffold a new project from a template.
+ * Implementation of the "mddg init" command — scaffold a new project from a template.
  */
 "use strict";
 
@@ -36,7 +36,7 @@ async function runInit(args) {
   const opts = parseInitArgs(args);
   if (opts.help) { process.stdout.write(makeHelp("init")); return; }
 
-  if (!opts.target) die("No destination directory specified.\nUsage: markfi init [--template <name>] <dir>");
+  if (!opts.target) die("No destination directory specified.\nUsage: mddg init [--template <name>] <dir>");
 
   if (!TEMPLATES.includes(opts.template)) {
     die(`Unknown template "${opts.template}". Available: ${TEMPLATES.join(", ")}`);
@@ -63,7 +63,7 @@ async function runInit(args) {
     `   ${targetDir}\n\n` +
     `${C.bold}Next steps:${C.reset}\n` +
     `   cd ${opts.target}\n` +
-    `   markfi build .\n`
+    `   mddg build .\n`
   );
 }
 

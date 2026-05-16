@@ -1,13 +1,13 @@
-# Contributing to markfi
+# Contributing to mddg
 
-Thank you for considering contributing to markfi!
+Thank you for considering contributing to mddg!
 
 ## Getting Started
 
 ```bash
 # Fork and clone the repo
-git clone https://github.com/vinodnal/markfi.git
-cd markfi
+git clone https://github.com/vinodnal/mddg.git
+cd mddg
 
 # Install dependencies (requires pnpm ≥ 9)
 pnpm install
@@ -54,7 +54,7 @@ chore: upgrade docx to v9.7
 
 ## Reporting Issues
 
-Open an issue at <https://github.com/vinodnal/markfi/issues>.  
+Open an issue at <https://github.com/vinodnal/mddg/issues>.  
 Include your Node.js version (`node -v`), OS, and the error output.
 
 ## License
