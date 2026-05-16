@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * bin/mdoc.js — mddg CLI entry point
+ * bin/mdoc.js — mdout CLI entry point
  * Delegates to src/cli/index.js
  */
 "use strict";

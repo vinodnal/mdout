@@ -1,10 +1,10 @@
 /**
  * src/cli/export.js
- * Implementation of the "mddg export" command.
+ * Implementation of the "mdout export" command.
  *
  * Sub-commands / formats:
- *   mddg export images  [--pages 1,3-5] [--format png|jpg] [--dpi N] <project-dir|pdf>
- *   mddg export md      [--no-cover]    [--out path.md]              <project-dir>
+ *   mdout export images  [--pages 1,3-5] [--format png|jpg] [--dpi N] <project-dir|pdf>
+ *   mdout export md      [--no-cover]    [--out path.md]              <project-dir>
  *
  * When no sub-command is given the first positional argument is the format.
  */
@@ -33,7 +33,7 @@ async function runExport(args) {
   const opts = parseExportArgs(args);
   if (opts.help) { process.stdout.write(makeHelp("export")); return; }
 
-  if (!opts.projectDir) die("No project directory specified.\nRun 'mddg export --help' for usage.");
+  if (!opts.projectDir) die("No project directory specified.\nRun 'mdout export --help' for usage.");
 
   const log = createLogger({ verbose: opts.verbose, quiet: opts.quiet });
 
