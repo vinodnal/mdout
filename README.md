@@ -4,6 +4,8 @@
 
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![CI](https://github.com/vinodnal/mdoc/actions/workflows/ci.yml/badge.svg)](https://github.com/vinodnal/mdoc/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/mdoc)](https://www.npmjs.com/package/mdoc)
 
 ---
 
@@ -48,11 +50,22 @@
 ## Installation
 
 ```bash
-# Install dependencies
-npm install
+# Install from npm
+npm install -g mdoc
+
+# Or with pnpm
+pnpm add -g mdoc
+```
+
+### Development / from source
+
+```bash
+git clone https://github.com/vinodnal/mdoc.git
+cd mdoc
+pnpm install
 
 # Make the mdoc command available globally (optional)
-npm install -g .
+pnpm install -g .
 ```
 
 ---

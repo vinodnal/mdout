@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
 
+# pnpm
+.pnpm-store/
+.pnpm-debug.log
+
 # Generated output
 *.docx
 *.pdf
@@ -11,6 +15,7 @@ projects/
 # Debug / temp artifacts
 *.png
 output_inspect/
+export_inspect_lo/
 
 # OS / editor
 .DS_Store
@@ -21,3 +26,7 @@ Thumbs.db
 
 # VS Code
 .vscode/
+
+# n8n
+.n8nac/
+

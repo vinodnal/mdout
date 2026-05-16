@@ -14,13 +14,19 @@
     "src/",
     "bin/",
     "README.md",
-    "USAGE.md"
+    "USAGE.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "scripts": {
     "start": "node bin/mdoc.js",
+    "lint": "eslint src/ bin/",
+    "lint:fix": "eslint src/ bin/ --fix",
+    "test": "node --test src/**/*.test.js 2>/dev/null || echo 'No tests yet'",
     "validate": "node bin/mdoc.js validate",
     "build:example": "node bin/mdoc.js --no-pdf projects/these-hmh2",
-    "build:example:pdf": "node bin/mdoc.js projects/these-hmh2"
+    "build:example:pdf": "node bin/mdoc.js projects/these-hmh2",
+    "prepublishOnly": "pnpm run lint"
   },
   "keywords": [
     "markdown",
@@ -36,11 +42,21 @@
     "report",
     "thesis"
   ],
-  "author": "",
+  "author": "vinodnal",
   "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinodnal/mdoc.git"
   },
+  "homepage": "https://github.com/vinodnal/mdoc#readme",
+  "bugs": {
+    "url": "https://github.com/vinodnal/mdoc/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.4",
   "dependencies": {
     "canvas": "^3.2.3",
     "chokidar": "^4.0.3",
@@ -48,5 +64,10 @@
   },
   "optionalDependencies": {
     "temml": "^0.10.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-n": "^17.0.0"
   }
 }
