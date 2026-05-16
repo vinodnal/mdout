@@ -1,6 +1,6 @@
 {
   "name": "@salahxg/mdout",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Markdown → DOCX, PDF, HTML, and presentation builder for developers and AI agents. Write documents in Markdown, compile to professional Word documents, PDFs, and more.",
   "main": "src/index.js",
   "exports": {
