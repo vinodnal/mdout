@@ -8,10 +8,10 @@ const { C, getVersion } = require("./utils");
 
 function makeHelp(cmd) {
   if (cmd === "validate") return `\
-${C.bold}mdoc validate${C.reset} — Validate a project without building
+${C.bold}mdout validate${C.reset} — Validate a project without building
 
 ${C.bold}Usage:${C.reset}
-  mdoc validate [options] <project-dir|project.config.js>
+  mdout validate [options] <project-dir|project.config.js>
 
 ${C.bold}Options:${C.reset}
   -h, --help        Show this help
@@ -23,10 +23,10 @@ ${C.bold}Exit codes:${C.reset}
 `;
 
   if (cmd === "export") return `\
-${C.bold}mdoc export${C.reset} — Export a project to images or flat Markdown
+${C.bold}mdout export${C.reset} — Export a project to images or flat Markdown
 
 ${C.bold}Usage:${C.reset}
-  mdoc export [format] [options] <project-dir|path.pdf>
+  mdout export [format] [options] <project-dir|path.pdf>
 
 ${C.bold}Formats:${C.reset}
   images        Convert PDF pages to PNG/JPEG images (default when both omitted)
@@ -57,18 +57,18 @@ ${C.bold}Markdown options:${C.reset}
       --no-cover              Omit cover.md from the flat output
 
 ${C.bold}Examples:${C.reset}
-  mdoc export projects/my-thesis
-  mdoc export images --pages 1,3-5 --dpi 200 projects/my-thesis
-  mdoc export images --pages 7 projects/these-hmh2/these_hmh2.pdf
-  mdoc export md --out ./thesis_flat.md projects/my-thesis
-  mdoc export images md --no-build --out ./out projects/my-thesis
+  mdout export projects/my-thesis
+  mdout export images --pages 1,3-5 --dpi 200 projects/my-thesis
+  mdout export images --pages 7 projects/these-hmh2/these_hmh2.pdf
+  mdout export md --out ./thesis_flat.md projects/my-thesis
+  mdout export images md --no-build --out ./out projects/my-thesis
 `;
 
   if (cmd === "init") return `\
-${C.bold}mdoc init${C.reset} — Scaffold a new project
+${C.bold}mdout init${C.reset} — Scaffold a new project
 
 ${C.bold}Usage:${C.reset}
-  mdoc init [options] <new-dir>
+  mdout init [options] <new-dir>
 
 ${C.bold}Options:${C.reset}
   -h, --help                  Show this help
@@ -76,17 +76,17 @@ ${C.bold}Options:${C.reset}
       Templates: simple | report | thesis | manual
 
 ${C.bold}Example:${C.reset}
-  mdoc init --template report ./my-report
+  mdout init --template report ./my-report
 `;
 
   return `\
-${C.bold}mdoc${C.reset} — Markdown → DOCX/PDF document builder  v${getVersion()}
+${C.bold}mdout${C.reset} — Markdown → DOCX/PDF/HTML document builder  v${getVersion()}
 
 ${C.bold}Usage:${C.reset}
-  mdoc [build] [options] <project-dir>
-  mdoc export [format] [options] <project-dir>
-  mdoc validate [--dep-graph] <project-dir>
-  mdoc init [--template <name>] <new-dir>
+  mdout [build] [options] <project-dir>
+  mdout export [format] [options] <project-dir>
+  mdout validate [--dep-graph] <project-dir>
+  mdout init [--template <name>] <new-dir>
 
 ${C.bold}Build options:${C.reset}
   -h, --help                   Show this help and exit
@@ -104,15 +104,15 @@ ${C.bold}Build options:${C.reset}
       --watch-debounce <ms>    Debounce delay for watch mode (default: 300 ms)
 
 ${C.bold}Examples:${C.reset}
-  mdoc projects/my-thesis
-  mdoc -v --pdf projects/my-thesis
-  mdoc --var author="Jane Doe" --var year=2026 projects/my-thesis
-  mdoc --json result.json projects/my-thesis
-  mdoc validate projects/my-thesis
-  mdoc export projects/my-thesis
-  mdoc export images --pages 1-5 --dpi 200 projects/my-thesis
-  mdoc export md --out ./flat.md projects/my-thesis
-  mdoc init --template thesis ./projects/new-thesis
+  mdout projects/my-thesis
+  mdout -v --pdf projects/my-thesis
+  mdout --var author="Jane Doe" --var year=2026 projects/my-thesis
+  mdout --json result.json projects/my-thesis
+  mdout validate projects/my-thesis
+  mdout export projects/my-thesis
+  mdout export images --pages 1-5 --dpi 200 projects/my-thesis
+  mdout export md --out ./flat.md projects/my-thesis
+  mdout init --template thesis ./projects/new-thesis
 `;
 }
 

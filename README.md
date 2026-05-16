@@ -1,11 +1,11 @@
-# mdoc
+# mdout
 
-> **Markdown → DOCX / PDF document builder** for Node.js — write your documents in plain Markdown, configure once, compile to a polished Word document and PDF.
+> **Markdown → DOCX / PDF / HTML document builder** for Node.js — write your documents in plain Markdown, configure once, compile to polished Word documents, PDFs, and more.
 
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![CI](https://github.com/vinodnal/mdoc/actions/workflows/ci.yml/badge.svg)](https://github.com/vinodnal/mdoc/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/mdoc)](https://www.npmjs.com/package/mdoc)
+[![CI](https://github.com/vinodnal/mdout/actions/workflows/ci.yml/badge.svg)](https://github.com/vinodnal/mdout/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/mdout)](https://www.npmjs.com/package/mdout)
 
 ---
 
@@ -34,7 +34,7 @@
 - **Watch mode** — `--watch` debounced rebuilds while you edit; Windows-friendly file-lock retry
 - **PDF generation** — via LibreOffice on Linux/macOS; tries Microsoft Word COM first on Windows; force with `--pdf-engine word|libreoffice`
 - **Export to images** — `mdoc export images` converts any project's PDF to PNG/JPEG pages via pdftoppm (preferred) or Ghostscript; select pages with `--pages 1,3-5`, set DPI with `--dpi`, choose format with `--image-format`
-- **Export to flat Markdown** — `mdoc export md` flattens all imported Markdown files and executes figure scripts to produce a single self-contained `.md` file; ideal for AI agent ingestion
+- **Export to flat Markdown** — `mdout export md` flattens all imported Markdown files and executes figure scripts to produce a single self-contained `.md` file; ideal for AI agent ingestion
 
 - **Machine-readable output** — `--json [path]` writes a structured result object after any export; combine with `--no-build` to skip rebuilding when DOCX is already up-to-date
 
@@ -51,20 +51,20 @@
 
 ```bash
 # Install from npm
-npm install -g mdoc
+npm install -g mdout
 
 # Or with pnpm
-pnpm add -g mdoc
+pnpm add -g mdout
 ```
 
 ### Development / from source
 
 ```bash
-git clone https://github.com/vinodnal/mdoc.git
-cd mdoc
+git clone https://github.com/vinodnal/mdout.git
+cd mdout
 pnpm install
 
-# Make the mdoc command available globally (optional)
+# Make the mdout command available globally (optional)
 pnpm install -g .
 ```
 
@@ -74,51 +74,51 @@ pnpm install -g .
 
 ```bash
 # Scaffold a new project from a template
-mdoc init --template thesis ./my-thesis
-mdoc init --template report ./reports/q1
+mdout init --template thesis ./my-thesis
+mdout init --template report ./reports/q1
 
 # Build a project (generates DOCX + PDF)
-mdoc projects/my-thesis
+mdout projects/my-thesis
 
 # DOCX only (no PDF)
-mdoc --no-pdf projects/my-thesis
+mdout --no-pdf projects/my-thesis
 
 # Verbose output with per-step timings
-mdoc -v projects/my-thesis
+mdout -v projects/my-thesis
 
 # Watch files and rebuild after changes
-mdoc --watch --no-pdf projects/my-thesis
+mdout --watch --no-pdf projects/my-thesis
 
 # Convert an existing DOCX to PDF (no rebuild)
-mdoc --pdf-only projects/my-thesis
+mdout --pdf-only projects/my-thesis
 
 # Force Word output on Windows, or LibreOffice if you need a fallback path
-mdoc --pdf-engine word projects/my-thesis
-mdoc --pdf-engine libreoffice projects/my-thesis
+mdout --pdf-engine word projects/my-thesis
+mdout --pdf-engine libreoffice projects/my-thesis
 
 # Override output path
-mdoc -o ./dist/output.docx projects/my-thesis
+mdout -o ./dist/output.docx projects/my-thesis
 
 # Validate imports and variables without building
-mdoc validate projects/my-thesis
+mdout validate projects/my-thesis
 
 # Show all CLI options
-mdoc --help
+mdout --help
 
 # Export all pages as PNG images (builds DOCX → PDF → images)
-mdoc export projects/my-thesis
+mdout export projects/my-thesis
 
 # Export specific pages at high DPI
-mdoc export images --pages 1,3-5 --dpi 200 projects/my-thesis
+mdout export images --pages 1,3-5 --dpi 200 projects/my-thesis
 
 # Flatten entire document to a single Markdown file for AI agents
-mdoc export md --out ./thesis_flat.md projects/my-thesis
+mdout export md --out ./thesis_flat.md projects/my-thesis
 
 # Re-export images from an existing DOCX without rebuilding
-mdoc export images --no-build --pages 2- projects/my-thesis
+mdout export images --no-build --pages 2- projects/my-thesis
 
 # Export help
-mdoc export --help
+mdout export --help
 ```
 
 ---
@@ -126,7 +126,7 @@ mdoc export --help
 ## Project Structure
 
 ```
-mdoc/
+mdout/
 ├── src/
 │   ├── cli.js             — CLI argument parsing and commands
 │   ├── builder.js         — Assembles Document from config
@@ -282,7 +282,7 @@ module.exports = {
 4. Build:
 
 ```bash
-mdoc projects/my-report
+mdout projects/my-report
 # Output: my-report.docx and my-report.pdf (if LibreOffice is available)
 ```
 
@@ -349,10 +349,10 @@ u.saveAndPrint(canvas, OUT);
 ## CLI Reference
 
 ```
-mdoc [build] [options] <project-dir>
-mdoc export [format] [options] <project-dir>
-mdoc validate [--dep-graph] <project-dir|config-path>
-mdoc init [--template <name>] <new-dir>
+mdout [build] [options] <project-dir>
+mdout export [format] [options] <project-dir>
+mdout validate [--dep-graph] <project-dir|config-path>
+mdout init [--template <name>] <new-dir>
 
 Options (build):
   -h, --help              Show help and exit
@@ -385,16 +385,16 @@ Options (export):
 
 **Examples:**
 ```bash
-mdoc projects/my-report                          # DOCX + PDF
-mdoc -v --no-pdf projects/my-report              # DOCX only, verbose
-mdoc --pdf-only projects/my-report               # PDF from existing DOCX
-mdoc -o ./dist/output.docx projects/my-report
-mdoc --watch projects/my-thesis                  # watch mode
-mdoc validate projects/my-report                 # validate only, no build
-mdoc init --template thesis ./new-thesis         # scaffold from template
-mdoc export projects/my-thesis                   # images + flat MD
-mdoc export images --pages 1-3 --dpi 300 projects/my-thesis
-mdoc export md --out ./flat.md projects/my-thesis
+mdout projects/my-report                          # DOCX + PDF
+mdout -v --no-pdf projects/my-report              # DOCX only, verbose
+mdout --pdf-only projects/my-report               # PDF from existing DOCX
+mdout -o ./dist/output.docx projects/my-report
+mdout --watch projects/my-thesis                  # watch mode
+mdout validate projects/my-report                 # validate only, no build
+mdout init --template thesis ./new-thesis         # scaffold from template
+mdout export projects/my-thesis                   # images + flat MD
+mdout export images --pages 1-3 --dpi 300 projects/my-thesis
+mdout export md --out ./flat.md projects/my-thesis
 ```
 
 > **Note:** PDF generation uses LibreOffice by default and will try Microsoft Word COM first on Windows. Use `--pdf-engine word` to force Word, or `--pdf-engine libreoffice` to force LibreOffice. Word PDF output is configured for print-quality rendering and keeps embedded figure compression disabled when possible.
@@ -473,5 +473,5 @@ Starter templates are available under `src/templates/`:
 Create a new project from a template:
 
 ```bash
-mdoc init --template thesis projects/my-thesis
+mdout init --template thesis projects/my-thesis
 ```

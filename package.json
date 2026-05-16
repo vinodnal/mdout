@@ -1,14 +1,14 @@
 {
-  "name": "@vinodnal/mdoc",
+  "name": "mdout",
   "version": "1.0.0",
-  "description": "Markdown → Word/PDF document builder for developers and AI agents. Write documents in Markdown, import images/scripts/other docs, compile to professional DOCX and PDF.",
+  "description": "Markdown → DOCX, PDF, HTML, and presentation builder for developers and AI agents. Write documents in Markdown, compile to professional Word documents, PDFs, and more.",
   "main": "src/index.js",
   "exports": {
     ".": "./src/index.js",
     "./canvas-utils": "./src/canvas-utils.js"
   },
   "bin": {
-    "mdoc": "./bin/mdoc.js"
+    "mdout": "./bin/mdoc.js"
   },
   "files": [
     "src/",
@@ -32,6 +32,9 @@
     "markdown",
     "docx",
     "pdf",
+    "html",
+    "presentation",
+    "slides",
     "word",
     "document",
     "builder",
@@ -46,11 +49,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vinodnal/mdoc.git"
+    "url": "git+https://github.com/vinodnal/mdout.git"
   },
-  "homepage": "https://github.com/vinodnal/mdoc#readme",
+  "homepage": "https://github.com/vinodnal/mdout#readme",
   "bugs": {
-    "url": "https://github.com/vinodnal/mdoc/issues"
+    "url": "https://github.com/vinodnal/mdout/issues"
   },
   "engines": {
     "node": ">=18.0.0",

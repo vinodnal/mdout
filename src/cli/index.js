@@ -29,7 +29,7 @@ function run(argv) {
   }
 
   if (cmd === "--version" || cmd === "version") {
-    process.stdout.write(`mdoc v${getVersion()}\n`);
+    process.stdout.write(`mdout v${getVersion()}\n`);
     return;
   }
 

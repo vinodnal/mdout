@@ -1,6 +1,6 @@
 /**
  * src/cli/validate.js
- * Implementation of the "mdoc validate" command.
+ * Implementation of the "mdout validate" command.
  */
 "use strict";
 
