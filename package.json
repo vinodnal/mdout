@@ -61,9 +61,11 @@
   },
   "packageManager": "pnpm@9.15.4",
   "dependencies": {
+    "adm-zip": "^0.5.17",
     "canvas": "^3.2.3",
     "chokidar": "^4.0.3",
-    "docx": "^9.6.1"
+    "docx": "^9.6.1",
+    "mammoth": "^1.12.0"
   },
   "optionalDependencies": {
     "temml": "^0.10.0"
@@ -71,6 +73,7 @@
   "devDependencies": {
     "@eslint/js": "^9.0.0",
     "eslint": "^9.0.0",
-    "eslint-plugin-n": "^17.0.0"
+    "eslint-plugin-n": "^17.0.0",
+    "word-extractor": "^1.0.4"
   }
 }

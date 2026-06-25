@@ -161,9 +161,13 @@ function parseMD(text, dir, R, importFn, opts = {}) {
 
       // @element: type: figure | title: ...
       if (verb === "element") {
-        const eOpts = parseDirectiveOpts(body);
-        const kind  = (eOpts.type || eOpts._path || "figure").toLowerCase();
-        const title = eOpts.title || "";
+        const parts   = body.split("|").map(s => s.trim());
+        const typeOpt  = parts.find(p => /^type:/i.test(p));
+        const titleOpt = parts.find(p => /^title:/i.test(p));
+        const kind  = typeOpt
+          ? typeOpt.replace(/^type:\s*/i, "").toLowerCase()
+          : (parts[0] || "figure").toLowerCase();
+        const title = titleOpt ? titleOpt.replace(/^title:\s*/i, "") : "";
         if (kind === "annex") {
           addAnnexTitle(title, currentAlignment());
           clearPending();
